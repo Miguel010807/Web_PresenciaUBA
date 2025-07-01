@@ -1,0 +1,44 @@
+----Components----
+-Cada componente debe hacer una sola cosa. Si hay muchos, dividanlo
+
+-Cada Componente tiene que comenzar en MAYUSCULA,
+ ejemplos: Employes.jsx =! employes.jsx
+
+-Cada componente solamente devuelve un hijo,
+ por ejemplo:
+ 
+ <> ---->Este es el inicio del Hijo
+    <div>
+        <h1>PresenciaUBA<h1/>   
+    <div/>
+            
+ </> ---->Este es el fin del Hijo
+Cualquier cosa que este afuera del "Hijo"
+lo tomara como un 2do Hijo
+y tirara la pagina
+
+------Proyecto------
+
+Dará la información de que estudiantes están en la escuela e información sobre ellos.
+Habrá términos para buscar los cursos y ver los horarios. Utilización de QR con condición de estar con el internet de la UBA. 
+La app se abre cuando la dirección IP local asignada por el router Wi-Fi de la UBA.
+
+------Objetivos------
+
+Poder hacer que tomar el presente sea más rápido sin necesidad de buscar al preceptor/a.
+Escaneando el código QR, el cual lo tendria el encargado, quedará registro con la hora exacta de registro(datatime).
+
+------Accesibilidad------
+
+Tener gmail @etec.uba.ar para confirmar que es parte de la ETEC(o del establecimiento requerido)
+Estar conectado con el WI-Fi de la ETEC para saber que se registró dentro de la escuela(IP local)
+
+------Ventajas para la Escuela------
+
+Habrá ahorro de tiempo administrativo para los preceptores.
+Mejorará en la puntualidad y control de asistencia
+
+------Panel de Gestión------
+
+Visualización en tiempo real de qué estudiantes están presentes en la base de datos.
+Exportación de asistencias por fecha, curso o estudiante.
