@@ -1,0 +1,20 @@
+.gitignore
+
+Main.jsx: contiene todos los componentes y ademas el css principal
+
+Componentes: es una funcion que devuelve elementos de interface y si no comienza en mayuscula
+
+useState(0) : el 0 es Count, es un valor inicial
+
+[setCount] : es la funcion actulizadora 
+
+const ejemplo = {Nombre: 'Miguel'} : es como un diccionario o un objeto
+                  Clave  Valor 
+
+props
+
+useEffect(()=> {
+  Esto ejecuta el codigo una vez si no hay nada en los 
+  cochetes, y si hay variables(dependencias)
+  se va a ejecutar tanto como
+},[])
