@@ -37,6 +37,12 @@ export function Operator() {
  );
 }
 
-const Productos=[{
-    nombre: 'Camiseta', precio: 20
-    nombre: 'Pantalon', precio: 30 }]
+
+const Productos=[{ nombre: 'Camiseta', precio: 20},
+                 {nombre: 'Pantalon', precio: 30 }]
+
+
+const ProdcutosConDescuento = Productos.map(produ =>({
+  
+  ...produ, descuento: "True" })) 
+

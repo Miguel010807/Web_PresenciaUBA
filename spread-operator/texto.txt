@@ -18,3 +18,5 @@ useEffect(()=> {
   cochetes, y si hay variables(dependencias)
   se va a ejecutar tanto como
 },[])
+
+.map copia el Array original y uso su copia
