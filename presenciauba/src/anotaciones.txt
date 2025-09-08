@@ -49,3 +49,53 @@ Login.jsx:
 - Si falla, muestra un mensaje de error.
 
 ----------------------------------------------
+
+EXPLICACIÓN DE QRScanner.jsx
+
+-----------------------------------
+IMPORTS
+-----------------------------------
+- useState: Hook de React para manejar el estado del resultado del escaneo.
+- QrReader: Componente de la librería react-qr-reader que permite leer códigos QR con la cámara del dispositivo.
+- api: archivo de configuración de Axios para enviar la información al backend.
+
+-----------------------------------
+ESTADO DEL COMPONENTE
+-----------------------------------
+- resultado: almacena un mensaje de éxito o error luego de escanear el QR.
+
+-----------------------------------
+FUNCIÓN handleScan
+-----------------------------------
+- Recibe como parámetro el contenido del QR leído (data).
+- Si existe data:
+    - Obtiene el token de autenticación guardado en localStorage.
+    - Hace una petición POST al backend (/asistencia/materia) enviando el QR escaneado.
+    - Si la respuesta es correcta:
+        - Actualiza el estado "resultado" mostrando un mensaje de éxito con la materia registrada.
+    - Si ocurre un error:
+        - Muestra un mensaje indicando que no se pudo registrar la asistencia.
+
+-----------------------------------
+INTERFAZ DEL USUARIO (JSX)
+-----------------------------------
+- Un contenedor con el título "Escanear código QR del aula".
+- El componente QrReader:
+    - Usa la cámara del dispositivo para detectar códigos QR.
+    - Cuando detecta un código, llama a handleScan para procesarlo.
+- Un párrafo que muestra el mensaje guardado en "resultado" (ejemplo: éxito o error).
+
+-----------------------------------
+EXPORT
+-----------------------------------
+- export default QRScanner: permite usar este componente en App.jsx.
+
+-----------------------------------
+RESUMEN
+-----------------------------------
+QRScanner.jsx:
+- Usa la cámara del dispositivo para leer un código QR único de cada aula.
+- Envía el QR al backend junto con el token del usuario.
+- Si es válido, registra la asistencia en la materia correspondiente.
+- Muestra en pantalla un mensaje de éxito o error según el resultado.
+-----------------------------------
