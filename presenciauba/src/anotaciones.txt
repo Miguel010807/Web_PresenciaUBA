@@ -99,3 +99,40 @@ QRScanner.jsx:
 - Si es válido, registra la asistencia en la materia correspondiente.
 - Muestra en pantalla un mensaje de éxito o error según el resultado.
 -----------------------------------
+
+EXPLICACIÓN DE StatusCard.jsx
+
+-----------------------------------
+IMPORTS
+-----------------------------------
+- React: necesario para crear componentes funcionales en React.
+
+-----------------------------------
+PROPS
+-----------------------------------
+- usuario: objeto que contiene información del usuario (nombre, apellido, rol).
+- conectado: booleano que indica si el usuario está conectado a la red Wi-Fi institucional.
+
+-----------------------------------
+INTERFAZ DEL USUARIO (JSX)
+-----------------------------------
+- Contenedor principal con clase "status-card".
+- Título "Estado de sesión".
+- Si el usuario está autenticado:
+    - Muestra el nombre completo y el rol del usuario con un icono de check.
+- Si no está autenticado:
+    - Muestra "No autenticado" con un icono de alerta.
+- Muestra también si está conectado al Wi-Fi UBA o no.
+
+-----------------------------------
+EXPORT
+-----------------------------------
+- export default StatusCard: permite usar este componente en App.jsx.
+
+-----------------------------------
+RESUMEN
+-----------------------------------
+StatusCard.jsx:
+- Permite al usuario ver rápidamente su estado de autenticación y conexión.
+- Es visual y simple, mostrando información relevante en tarjetas.
+- Se actualiza automáticamente según las props recibidas del componente padre.
