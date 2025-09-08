@@ -1,5 +1,5 @@
 import { useState } from "react"; // Hook de React para manejar estados locales
-import api from "../api"; // Importa el archivo de configuración de Axios (para hablar con el backend)
+//import api from "../api"; // Importa el archivo de configuración de Axios (para hablar con el backend)
 
 // Componente de Login.
 function Login({ onLogin }) {
