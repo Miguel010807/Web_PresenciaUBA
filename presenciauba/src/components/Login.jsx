@@ -1,7 +1,7 @@
 import { useState } from "react"; // Hook de React para manejar estados locales
 import api from "../api"; // Importa el archivo de configuración de Axios (para hablar con el backend)
 
-// Componente de Login
+// Componente de Login.
 function Login({ onLogin }) {
   // Estados para manejar los inputs y errores
   const [correo, setCorreo] = useState("");
