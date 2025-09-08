@@ -1,7 +1,12 @@
-import "./App.css";
-
-function App() {
-  return <></>;
+function MyButton() {
+  return <button>Soy un botón</button>;
 }
 
-export default App;
+export default function MyApp() {
+  return (
+    <div>
+      <h1>Bienvenido a mi aplicación</h1>
+      <MyButton />
+    </div>
+  );
+}
