@@ -1,0 +1,17 @@
+handleSubmit: sirve para capturar el evento de envío del formulario
+ (onSubmit) y ejecutar la lógica que quieras (guardar datos, validarlos,
+  mandarlos a un backend, etc.), en lugar de que el navegador recargue la página por defecto.
+
+e.preventDefault: Lo que hace es detener el comportamiento automático que 
+el navegador ejecutaría al dispararse ese evento.
+
+api.post: Es una llamada a un método post de un objeto api.
+
+await: Hace que el código espere a que la promesa de api.post se resuelva.
+Mientras tanto, el programa no sigue ejecutando la siguiente línea.
+
+localStore: Es un almacenamiento interno del navegador .
+Sirve para guardar datos en el navegador del cliente.
+
+res.data.token: Es el valor que el backend devolvió en la respuesta .
+Ese token se usa para identificar al usuario en futuras peticiones.
