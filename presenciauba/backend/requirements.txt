@@ -1,7 +1,4 @@
-Flask
-Flask-SQLAlchemy
-Flask-Migrate
-Flask-Cors
+flask
+flask_sqlalchemy
+flask_cors
 python-dotenv
-PyMySQL
-PyJWT
