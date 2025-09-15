@@ -1,7 +1,7 @@
 from app import app, db
 from models import User
 
-# 📌 Script para crear usuarios de prueba
+# Script para crear usuarios de prueba
 with app.app_context():
     db.create_all()
 
@@ -12,6 +12,6 @@ with app.app_context():
         ]
         db.session.add_all(usuarios)
         db.session.commit()
-        print("Usuarios iniciales cargados 🚀")
+        print("Usuarios iniciales cargados ")
     else:
         print("Ya existen usuarios, no se cargó nada.")

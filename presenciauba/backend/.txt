@@ -1,0 +1,124 @@
+EXPLICACIÓN DE models.py
+
+IMPORTS
+SQLAlchemy: ORM (Object Relational Mapper) que facilita trabajar con bases de datos en Python sin escribir SQL directo.
+
+
+
+CLASES (MODELOS DE BASE DE DATOS)
+Usuario: tabla de usuarios (id, nombre, apellido, correo, contraseña, rol).
+
+
+Materia: tabla de materias (id, nombre, aula, código QR único).
+
+
+Asistencia: tabla que relaciona a un usuario con una materia en una fecha determinada.
+
+
+
+RELACIONES
+Cada usuario puede estar en muchas asistencias.
+
+
+Cada materia puede tener muchos registros de asistencia.
+
+
+
+RESUMEN
+models.py: define las tablas y relaciones de la base de datos para que el backend pueda guardar usuarios, materias y asistencias.
+
+EXPLICACIÓN DE config.py
+
+IMPORTS
+os: para leer variables de entorno.
+
+
+
+CLASE Config
+SQLALCHEMY_DATABASE_URI: ruta de la base de datos (PostgreSQL, MySQL o SQLite según lo que esté en .env).
+
+
+SQLALCHEMY_TRACK_MODIFICATIONS: desactivado para optimizar rendimiento.
+
+
+SECRET_KEY: clave secreta usada para tokens o sesiones.
+
+
+
+RESUMEN
+config.py: centraliza la configuración del backend. Sirve para que el proyecto sea fácil de mover entre entornos (desarrollo, producción, etc.).
+
+EXPLICACIÓN DE seed.py
+
+IMPORTS
+db y modelos: para insertar datos iniciales.
+
+
+
+FUNCIÓN PRINCIPAL
+Conecta a la base de datos.
+
+
+Inserta usuarios de prueba, materias con sus códigos QR y algunas asistencias iniciales.
+
+
+Permite arrancar el proyecto con datos cargados sin hacerlo manualmente.
+
+
+
+RESUMEN
+seed.py: script que sirve para cargar datos iniciales en la base de datos (usuarios, materias, etc.).
+
+EXPLICACIÓN DE requirements.txt
+
+CONTENIDO
+Flask: framework web.
+
+
+Flask-CORS: permite que React se conecte al backend.
+
+
+Flask-SQLAlchemy: ORM para manejar la base de datos.
+
+
+python-dotenv: para cargar variables de entorno desde .env.
+
+
+
+RESUMEN
+requirements.txt: lista todas las dependencias necesarias para correr el backend.
+
+EXPLICACIÓN DE .env.example
+
+CONTENIDO
+Variables de entorno de ejemplo:
+
+
+DATABASE_URL: conexión a la base de datos.
+
+
+SECRET_KEY: clave secreta del backend.
+
+
+
+RESUMEN
+.env.example: archivo de ejemplo para que los desarrolladores sepan qué variables deben crear en su .env real.
+
+RESUMEN GENERAL DEL BACKEND
+app.py → lógica principal y rutas de la API.
+
+
+models.py → define tablas y relaciones de la base de datos.
+
+
+config.py → configuración de conexión y claves.
+
+
+seed.py → inserta datos de prueba.
+
+
+requirements.txt → dependencias necesarias.
+
+
+.env.example → muestra qué variables deben configurarse.
+

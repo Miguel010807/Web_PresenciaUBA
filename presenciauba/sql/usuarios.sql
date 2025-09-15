@@ -5,6 +5,7 @@ CREATE TABLE usuarios (
     apellido VARCHAR(100) NOT NULL,
     dni VARCHAR(20),  -- opcional
     correo_institucional VARCHAR(150) UNIQUE NOT NULL,
+    contraseña TEXT UNIQUE NOT NULL,
     rol ENUM('estudiante', 'docente', 'preceptor', 'admin') NOT NULL,
     carrera_curso VARCHAR(100),
     estado ENUM('activo', 'inactivo') DEFAULT 'activo'
@@ -64,3 +65,8 @@ CREATE TABLE incidencias (
     fecha_hora DATETIME NOT NULL,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
+
+INSERT INTO usuarios (correo_institucional, constraseña, nombre, apellido)
+VALUES ('mdiaz@etec.uba.ar', '12345678', 'Mario', 'Díaz');
+
+

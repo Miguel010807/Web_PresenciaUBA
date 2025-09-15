@@ -1,35 +1,38 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS #sirve para que el backend (Flask en este caso) permita peticiones desde un dominio diferente al suyo.
-from models import db, User, Asistencia
-from config import Config
+from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config.from_object(Config)  # Carga configuración desde config.py
-CORS(app)  # Permite peticiones desde el frontend (React)
+CORS(app, resources={r"/*": {"origins": "*"}})
+# Configuración de MySQL
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://10.9.120.5:8080/PresenciaUBA'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db.init_app(app)  # Inicializa la conexión a la base de datos
+db = SQLAlchemy(app)
 
 
 @app.route("/")
 def index():
-    # Ruta de prueba para ver si la API funciona
-    return jsonify({"message": "Presencia UBA API funcionando 🚀"})
+    return jsonify({"message": "Presencia UBA API funcionando"})
 
 
 # Endpoint para login
 @app.route("/login", methods=["POST"])
 def login():
-    data = request.json  # Recibe los datos en JSON
+    data = request.json
     correo = data.get("correo")
     password = data.get("password")
 
-    # Busca un usuario con ese correo y contraseña
-    user = User.query.filter_by(correo=correo, password=password).first()
-    if not user:
+    # Consulta directa a MySQL
+    query = "SELECT * FROM usuarios WHERE correo_institucional=%s AND password=%s LIMIT 1"
+    result = db.session.execute(query, (correo, password)).fetchone()
+
+    if not result:
         return jsonify({"error": "Credenciales inválidas"}), 401
 
-    # Devuelve los datos del usuario
-    return jsonify({"message": "Login exitoso", "user": user.to_dict()})
+    # Devuelve los datos del usuario como diccionario
+    user = dict(result.items())
+    return jsonify({"message": "Login exitoso", "user": user})
 
 
 # Endpoint para registrar asistencia con QR
@@ -39,27 +42,29 @@ def registrar_asistencia():
     user_id = data.get("user_id")
     qr_code = data.get("qr_code")
 
-    # Busca al usuario en la base de datos
-    user = User.query.get(user_id)
-    if not user:
+    # Verifica que el usuario exista
+    query_user = "SELECT * FROM usuarios WHERE id_usuario=%s"
+    result_user = db.session.execute(query_user, (user_id,)).fetchone()
+    if not result_user:
         return jsonify({"error": "Usuario no encontrado"}), 404
 
-    # Crea la asistencia
-    asistencia = Asistencia(user_id=user.id, qr_code=qr_code)
-    db.session.add(asistencia)
+    # Inserta la asistencia
+    query_insert = "INSERT INTO asistencias (user_id, qr_code) VALUES (%s, %s)"
+    db.session.execute(query_insert, (user_id, qr_code))
     db.session.commit()
 
-    return jsonify({"message": "Asistencia registrada", "asistencia": asistencia.to_dict()})
+    return jsonify({"message": "Asistencia registrada"})
 
 
 # Endpoint para obtener asistencias de un usuario
 @app.route("/asistencias/<int:user_id>", methods=["GET"])
 def obtener_asistencias(user_id):
-    asistencias = Asistencia.query.filter_by(user_id=user_id).all()
-    return jsonify([a.to_dict() for a in asistencias])
+    query = "SELECT * FROM asistencias WHERE user_id=%s"
+    results = db.session.execute(query, (user_id,)).fetchall()
+
+    asistencias = [dict(row.items()) for row in results]
+    return jsonify(asistencias)
 
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()  # Crea las tablas si no existen
-    app.run(debug=True)  # Ejecuta el servidor en modo debug
+    app.run(debug=True)
