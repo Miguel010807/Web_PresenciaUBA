@@ -1,0 +1,14 @@
+Para crear el Entorno Virtual
+´´´
+python -m venv .venv
+´´´
+
+Para activar el Entorno Virtual
+```
+source .venv/bin/activate
+```
+
+Instalacion de los Paquetes Requeridos
+```
+pip install flask flask-cors mysql-connector-python flask-sqlalchemy
+```

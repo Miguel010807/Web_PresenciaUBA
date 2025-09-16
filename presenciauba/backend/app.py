@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import mysql.connector
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -34,36 +35,6 @@ def login():
     user = dict(result.items())
     return jsonify({"message": "Login exitoso", "user": user})
 
-
-# Endpoint para registrar asistencia con QR
-@app.route("/asistencia", methods=["POST"])
-def registrar_asistencia():
-    data = request.json
-    user_id = data.get("user_id")
-    qr_code = data.get("qr_code")
-
-    # Verifica que el usuario exista
-    query_user = "SELECT * FROM usuarios WHERE id_usuario=%s"
-    result_user = db.session.execute(query_user, (user_id,)).fetchone()
-    if not result_user:
-        return jsonify({"error": "Usuario no encontrado"}), 404
-
-    # Inserta la asistencia
-    query_insert = "INSERT INTO asistencias (user_id, qr_code) VALUES (%s, %s)"
-    db.session.execute(query_insert, (user_id, qr_code))
-    db.session.commit()
-
-    return jsonify({"message": "Asistencia registrada"})
-
-
-# Endpoint para obtener asistencias de un usuario
-@app.route("/asistencias/<int:user_id>", methods=["GET"])
-def obtener_asistencias(user_id):
-    query = "SELECT * FROM asistencias WHERE user_id=%s"
-    results = db.session.execute(query, (user_id,)).fetchall()
-
-    asistencias = [dict(row.items()) for row in results]
-    return jsonify(asistencias)
 
 
 if __name__ == "__main__":
