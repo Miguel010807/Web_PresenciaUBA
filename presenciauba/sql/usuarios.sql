@@ -11,6 +11,19 @@ CREATE TABLE usuarios (
     estado ENUM('activo', 'inactivo') DEFAULT 'activo'
 );
 
+INSERT INTO usuarios (correo_institucional, constraseña, nombre, apellido)
+VALUES ('mdiaz@etec.uba.ar', 'miguel1234', 'Miguel Angel', 'Díaz'),
+       ('tgomez@etec.uba.ar', 'thiago1234', "Thiago Gomez", "Gomez Ovelar"),
+       ('pdellatorre@etec.uba.ar','priscila1234','Priscila Antonella','Della Torre'),
+       ('fgvalerianoclaros@etec.uba.ar','gabriel1234','Fabian Gabriel','Valeriano Claro'),
+       ('jcari@etec.uba.ar','joel1234','Joel Agustin','Cari'),
+       ('bcamachouscamayta@etec@etec.uba.ar','briseida1234','Briseida Eva', 'Camacho Uscamayta'),
+       ('luavia@etec.uba.ar','luciano1234','Luciano Uriel','Savia'),
+       ('','','','');
+       
+       
+contraseña TEXT UNIQUE NOT NULL,
+
 -- Tabla Materias / Cursos
 CREATE TABLE materias (
     id_materia INT AUTO_INCREMENT PRIMARY KEY,
