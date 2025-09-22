@@ -15,3 +15,7 @@ with app.app_context():
         print("Usuarios iniciales cargados ")
     else:
         print("Ya existen usuarios, no se cargó nada.")
+#Crea la base de datos y las tablas si no existen.
+#Inserta usuarios de prueba automáticamente (estudiante y docente).
+#Evita que se repitan si ya hay usuarios cargados.
+#Script para iniciar tu sistema con datos de prueba y poder probar el login y los roles sin cargar nada manualmente.

@@ -10,5 +10,5 @@ source .venv/bin/activate
 
 Instalacion de los Paquetes Requeridos
 ```
-pip install flask flask-cors mysql-connector-python flask-sqlalchemy
+pip install flask flask-cors mysql-connector-python flask-sqlalchemy flask-jwt-extended
 ```
