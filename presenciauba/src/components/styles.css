@@ -3,19 +3,36 @@ body {
   background: #f5f5f5;
   margin: 0;
   padding: 0;
+
+  display: flex;
+  justify-content: center; /* centra horizontalmente */
+  align-items: center; /* centra verticalmente */
+  height: 100vh; /* ocupa toda la pantalla */
 }
 
-.login-container,
+.container {
+  display: flex;
+  flex-direction: column; /* apila los elementos uno debajo del otro */
+  gap: 20px; /* espacio entre login, qrscanner y status */
+  width: 100%;
+  max-width: 400px; /* ancho máximo de la columna */
+}
+
+.login-container {
+  display: flex;
+  justify-content: center; /* centra horizontalmente */
+}
+
 .qrscanner-container,
 .status-card {
   background: #fff;
-  margin: 20px auto;
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
+  width: 100%;
 }
 
+/* inputs y botones */
 input,
 button {
   display: block;

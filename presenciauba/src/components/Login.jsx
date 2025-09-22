@@ -11,10 +11,8 @@ function Login({ onLogin }) {
     try {
       const res = await fetch("http://127.0.0.1:5000/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ correo, contraseña}),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo, password }),
       });
 
       const data = await res.json();
@@ -24,8 +22,11 @@ function Login({ onLogin }) {
         return;
       }
 
-      // Guardamos el usuario en localStorage
-      localStorage.setItem("nombre", JSON.stringify(data.usuarios));
+      // Guardamos el token en localStorage
+      localStorage.setItem("token", data.token);
+
+      // Guardamos también el usuario (sin contraseña)
+      localStorage.setItem("usuario", JSON.stringify(data.user));
 
       // Avisamos al componente padre
       onLogin(data.user);
@@ -37,7 +38,6 @@ function Login({ onLogin }) {
 
   return (
     <div className="login-container">
-      <h2>Presencia UBA</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="email"

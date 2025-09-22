@@ -11,15 +11,26 @@ CREATE TABLE usuarios (
     estado ENUM('activo', 'inactivo') DEFAULT 'activo'
 );
 
-INSERT INTO usuarios (correo_institucional, constraseña, nombre, apellido)
-VALUES ('mdiaz@etec.uba.ar', 'miguel1234', 'Miguel Angel', 'Díaz'),
-       ('tgomez@etec.uba.ar', 'thiago1234', "Thiago Gomez", "Gomez Ovelar"),
-       ('pdellatorre@etec.uba.ar','priscila1234','Priscila Antonella','Della Torre'),
-       ('fgvalerianoclaros@etec.uba.ar','gabriel1234','Fabian Gabriel','Valeriano Claro'),
-       ('jcari@etec.uba.ar','joel1234','Joel Agustin','Cari'),
-       ('bcamachouscamayta@etec@etec.uba.ar','briseida1234','Briseida Eva', 'Camacho Uscamayta'),
-       ('luavia@etec.uba.ar','luciano1234','Luciano Uriel','Savia'),
-       ('','','','');
+INSERT INTO usuarios (correo_institucional, constraseña, nombre, apellido, rol)
+VALUES ('tgomez@etec.uba.ar', 'thiago1234', "Thiago David", "Gomez Ovelar", 'estudiante'), --Thiago
+       ('mdiaz@etec.uba.ar', 'miguel1234', 'Miguel Angel', 'Díaz', 'estudiante'), --Miguel
+       ('pdellatorre@etec.uba.ar','priscila1234','Priscila Antonella','Della Torre', 'estudiante'), --Priscila
+       ('fgvalerianoclaros@etec.uba.ar','gabriel1234','Fabian Gabriel','Valeriano Claro', 'estudiante'), --Gabriel
+       ('jcari@etec.uba.ar','joel1234','Joel Agustin','Cari', 'estudiante'), --Joel
+       ('bcamachouscamayta@etec@etec.uba.ar','briseida1234','Briseida Eva', 'Camacho Uscamayta', 'estudiante'), --Briseida
+       ('luavia@etec.uba.ar','luciano1234','Luciano Uriel','Savia', 'estudiante'), --Lucho S
+       ('lucianoalcaraz@etec.uba.ar','luciano123','Luciano','Alcaraz', 'estudiante'), --Lucho A
+       ('baguirrepinaya@etec.uba.ar','brigit123','Brigit lisette','Aguirre Pinaya', 'estudiante'), --Brigit
+       ('lslopez@etec.uba.ar','luana1234','Luana Sofia','Lopez', 'estudiante'), --Luana
+       ('kdiaz@etec.uba.ar','karen1234','Karen Johana','Diaz', 'estudiante'), --Karen
+       ('leonardoojeda@etec.uba.ar','leonardo1234','Leonardo','Ojeda', 'estudiante'), --Leonardo
+       ('jbmendozacabrera@etec.uba.ar','julieta1234','Julieta Belen','Mendoza Cabrera', 'estudiante'), --Julieta
+       ('acporcoflores@etec.uba.ar','ana123','Ana Cristina','Porco Flores', 'estudiante'), --Ana
+       ('sperezramirez@etec.uba.ar','sol1234','Sol','Perez Ramirez', 'estudiante'), --Sol
+       ('bumoyanocaruso@etec.uba.ar','bautista1234','Baustista Uriel','Mayono Caruso', 'estudiante'), --Bauti
+    --Docentes   
+       ('fvillace@etec.uba.ar', 'federico1234', 'Federico', 'Villace', 'docente'), --Fede
+       ('tmayorga@etec.uba.ar','tomas1234','Tomas','Mayorga', 'docente'); --Tomas
        
        
 contraseña TEXT UNIQUE NOT NULL,
@@ -81,5 +92,3 @@ CREATE TABLE incidencias (
 
 INSERT INTO usuarios (correo_institucional, constraseña, nombre, apellido)
 VALUES ('mdiaz@etec.uba.ar', '12345678', 'Mario', 'Díaz');
-
-
