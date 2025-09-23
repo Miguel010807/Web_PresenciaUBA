@@ -14,7 +14,7 @@ function Login({ onLogin }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correo, password }),
       });
-
+      
       const data = await res.json();
 
       if (!res.ok) {
