@@ -14,7 +14,7 @@ function Login({ onLogin }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correo, password }),
       });
-      
+
       const data = await res.json();
 
       if (!res.ok) {
@@ -23,21 +23,24 @@ function Login({ onLogin }) {
       }
 
       // Guardamos el token en localStorage
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.token || "");
 
-      // Guardamos también el usuario (sin contraseña)
+      // Guardamos también el usuario (sin contraseña si querés)
       localStorage.setItem("usuario", JSON.stringify(data.user));
 
       // Avisamos al componente padre
-      onLogin(data.user);
+      if (onLogin) {
+        onLogin(data.user);
+      }
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setError("No se pudo conectar con el backend.");
     }
   };
 
   return (
     <div className="login-container">
+      <h2>Presencia UBA</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="email"

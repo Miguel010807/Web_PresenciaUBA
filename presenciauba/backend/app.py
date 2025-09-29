@@ -31,10 +31,10 @@ def login():
         conn = get_connection()
         with conn.cursor() as cursor:
             sql = """
-                SELECT correo_institucional, password
-                FROM usuarios
-                WHERE correo_institucional=%s AND password=%s
-                LIMIT 1
+            SELECT id_usuario, nombre, apellido, correo_institucional
+            FROM usuarios
+            WHERE correo_institucional=%s AND password=%s
+            LIMIT 1
             """
             cursor.execute(sql, (correo, password))
             user = cursor.fetchone()
@@ -44,10 +44,12 @@ def login():
             return jsonify({"error": "Credenciales inválidas"}), 401
 
         return jsonify({
-               "message": "Login exitoso",
-            "user": {
-                "correo": user[0],
-                "password": user[1]
+        "message": "Login exitoso",
+        "user": {
+        "id": user[0],
+        "nombre": user[1],
+        "apellido": user[2],
+        "correo": user[3]
         }})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
