@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Login from "./components/Login";
+import Login from "./components/Login/Login";
 
 function App() {
   const [usuario, setUsuario] = useState(null);

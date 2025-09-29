@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./Login.css";
 
 function Login({ onLogin }) {
   const [correo, setCorreo] = useState("");
@@ -9,7 +10,7 @@ function Login({ onLogin }) {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/login", {
+      const res = await fetch("http://10.56.2.47:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correo, password }),
@@ -40,7 +41,7 @@ function Login({ onLogin }) {
 
   return (
     <div className="login-container">
-      <h2>Presencia UBA</h2>
+      <h2 className="login-titulo">Presencia UBA</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="email"
