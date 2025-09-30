@@ -61,7 +61,7 @@ function Login({ onLogin }) {
           {/* Envolvemos label e input */}
           <label htmlFor="password">Contraseña:</label>
           <input
-            id="password" // Añadimos un id para relacionarlo con la label
+            id="password" // Añadi un id para relacionarlo con la label
             type="password"
             placeholder="ingrese su contraseña" // Cambiamos el placeholder
             value={password}
