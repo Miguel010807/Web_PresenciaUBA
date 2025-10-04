@@ -14,7 +14,7 @@ function Login({ onLogin }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ correo, contraseña}),
+        body: JSON.stringify({ correo, password }),
       });
 
       const data = await res.json();
@@ -25,10 +25,10 @@ function Login({ onLogin }) {
       }
 
       // Guardamos el usuario en localStorage
-      localStorage.setItem("nombre", JSON.stringify(data.usuarios));
+      localStorage.setItem("usuario", JSON.stringify(data.usuarios));
 
       // Avisamos al componente padre
-      onLogin(data.user);
+      onLogin(data.usuarios);
     } catch (err) {
       console.log(err);
       setError("No se pudo conectar con el backend.");

@@ -11,18 +11,42 @@ CREATE TABLE usuarios (
     estado ENUM('activo', 'inactivo') DEFAULT 'activo'
 );
 
+-- Version sqlite3
 INSERT INTO usuarios (correo_institucional, constraseña, nombre, apellido)
 VALUES ('mdiaz@etec.uba.ar', 'miguel1234', 'Miguel Angel', 'Díaz'),
        ('tgomez@etec.uba.ar', 'thiago1234', "Thiago Gomez", "Gomez Ovelar"),
-       ('pdellatorre@etec.uba.ar','priscila1234','Priscila Antonella','Della Torre'),
+      ('pdellatorre@etec.uba.ar','priscila1234','Priscila Antonella','Della Torre'),
        ('fgvalerianoclaros@etec.uba.ar','gabriel1234','Fabian Gabriel','Valeriano Claro'),
        ('jcari@etec.uba.ar','joel1234','Joel Agustin','Cari'),
        ('bcamachouscamayta@etec@etec.uba.ar','briseida1234','Briseida Eva', 'Camacho Uscamayta'),
        ('luavia@etec.uba.ar','luciano1234','Luciano Uriel','Savia'),
-       ('','','','');
+       ('sperezramirez@etec.uba.ar','sol1234','Sol','Perez Ramirez'),
+      ('jbmendozacabrera@etec.uba.ar','julieta1234','Julieta Belen','Mendoza Cabrera'),
+       ('kdiaz@etec.uba.ar','karen1234','Karen Johana','Diaz'),
+       ('bumoyanocaruso@etec.uba.ar','bautista1234','Baustista Uriel','Mayona Caruso'),
+       ('leonardoojeda@etec.uba.ar','leonardo1234','Leonardo','Ojeda'),
+       ('lslopez@etec.uba.ar','luana1234','Luana Sofia','Lopez'),
+      ('acporcoflores@etec.uba.ar','ana123','Ana Cristina','Porco Flores');
+
+--Version MySQL
+INSERT INTO usuarios (correo_institucional, contraseña, nombre, apellido)
+VALUES 
+    ('mdiaz@etec.uba.ar', 'miguel1234', 'Miguel Angel', 'Díaz'),
+    ('tgomez@etec.uba.ar', 'thiago1234', 'Thiago Gomez', 'Gomez Ovelar'),
+    ('pdellatorre@etec.uba.ar', 'priscila1234', 'Priscila Antonella', 'Della Torre'),
+    ('fgvalerianoclaros@etec.uba.ar', 'gabriel1234', 'Fabian Gabriel', 'Valeriano Claro'),
+    ('jcari@etec.uba.ar', 'joel1234', 'Joel Agustin', 'Cari'),
+    ('bcamachouscamayta@etec.uba.ar', 'briseida1234', 'Briseida Eva', 'Camacho Uscamayta'),
+    ('luavia@etec.uba.ar', 'luciano1234', 'Luciano Uriel', 'Savia'),
+    ('sperezramirez@etec.uba.ar', 'sol1234', 'Sol', 'Perez Ramirez'),
+    ('jbmendozacabrera@etec.uba.ar', 'julieta1234', 'Julieta Belen', 'Mendoza Cabrera'),
+    ('kdiaz@etec.uba.ar', 'karen1234', 'Karen Johana', 'Diaz'),
+    ('bumoyanocaruso@etec.uba.ar', 'bautista1234', 'Baustista Uriel', 'Mayona Caruso'),
+    ('leonardoojeda@etec.uba.ar', 'leonardo1234', 'Leonardo', 'Ojeda'),
+    ('lslopez@etec.uba.ar', 'luana1234', 'Luana Sofia', 'Lopez'),
+    ('acporcoflores@etec.uba.ar', 'ana123', 'Ana Cristina', 'Porco Flores');
        
-       
-contraseña TEXT UNIQUE NOT NULL,
+
 
 -- Tabla Materias / Cursos
 CREATE TABLE materias (
