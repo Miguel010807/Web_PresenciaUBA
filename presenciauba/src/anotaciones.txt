@@ -136,3 +136,7 @@ StatusCard.jsx:
 - Permite al usuario ver rápidamente su estado de autenticación y conexión.
 - Es visual y simple, mostrando información relevante en tarjetas.
 - Se actualiza automáticamente según las props recibidas del componente padre.
+------------------------------------
+PUT: Actualiza
+GET: Muestra
+DELETE: Borra

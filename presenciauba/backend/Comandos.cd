@@ -10,5 +10,24 @@ source .venv/bin/activate
 
 Instalacion de los Paquetes Requeridos
 ```
-pip install flask flask-cors mysql-connector-python flask-sqlalchemy
+pip install flask flask-cors mysql-connector-python flask-sqlalchemy flask-jwt-extended pymysql
 ```
+
+
+para correr el backend
+```
+python app.py
+```
+
+para levantar el backend en modo debug
+```
+python app.py --debug
+```
+
+para levantar react
+```
+npm start
+```
+
+
+(.env) <--- tarea de 8 puntos

@@ -1,15 +1,34 @@
-import Login from "./components/Login";
+import { useState } from "react";
+import Login from "./components/Login/Login";
 
-function MyButton() {
-  return <button>Soy un botón</button>;
-}
+function App() {
+  const [usuario, setUsuario] = useState(null);
 
-export default function MyApp() {
+  const handleLogin = (user) => {
+    console.log("Usuario logueado:", user);
+    setUsuario(user);
+  };
+
   return (
     <div>
-      <h1>Bienvenido a mi aplicación</h1>
-      <MyButton />
-      <Login />
+      {!usuario ? (
+        <Login onLogin={handleLogin} /> //<--- si no hay usuario te muestra esto
+      ) : (
+        <div>
+          <h1>Bienvenido {usuario.nombre}</h1>
+          <button
+            onClick={() => {
+              localStorage.removeItem("token"); //<-- si hay usuario te muestra esto
+              localStorage.removeItem("usuario");
+              setUsuario(null);
+            }}
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      )}
     </div>
   );
 }
+
+export default App;
