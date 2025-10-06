@@ -39,31 +39,23 @@ function Login({ onLogin }) {
     <div className="login-container">
       <h2 className="login-titulo">Presencia UBA</h2>
       <form onSubmit={handleSubmit} className="login-form">
-        {" "}
-        {/* Añadimos una clase al formulario para el CSS */}
-        {/* Campo de Correo Institucional */}
         <div className="form-group">
-          {" "}
-          {/* Envolvemos label e input */}
           <label htmlFor="correo">Correo institucional:</label>
           <input
-            id="correo" // Añadimos un id para relacionarlo con la label
+            id="correo"
             type="email"
-            placeholder="ejemplo@etec.uba.ar" // Cambiamos el placeholder para que no repita la label
+            placeholder="ejemplo@etec.uba.ar"
             value={correo}
             onChange={(e) => setCorreo(e.target.value)}
             required
           />
         </div>
-        {/* Campo de Contraseña */}
         <div className="form-group">
-          {" "}
-          {/* Envolvemos label e input */}
           <label htmlFor="password">Contraseña:</label>
           <input
-            id="password" // Añadi un id para relacionarlo con la label
+            id="password"
             type="password"
-            placeholder="ingrese su contraseña" // Cambiamos el placeholder
+            placeholder="ingrese su contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -72,7 +64,6 @@ function Login({ onLogin }) {
         <button type="submit">Iniciar sesión</button>
         {error && <p className="error">{error}</p>}
       </form>
-      {/* Footer agregado */}
       <footer className="footer-copy">
         © derechos reservados por la ETEC UBA <br />
         Hecho por Thiago Gomez y Miguel Díaz

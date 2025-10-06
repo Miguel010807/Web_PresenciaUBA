@@ -1,0 +1,19 @@
+Antes de iniciar activamos los node_modules
+´´´
+npm install
+´´´
+
+Para correr react en localhost
+´´´
+npm run dev
+´´´
+
+Para que lo puedas abrir de otra pc
+´´´
+npm run dev -- --host
+´´´
+
+Instalaciones necesarias antes de ejecutar el programa
+´´´
+npm install react-router-dom
+´´´
