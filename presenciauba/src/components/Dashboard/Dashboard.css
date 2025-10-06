@@ -1,0 +1,49 @@
+.dashboard-container {
+  position: relative;
+  padding: 20px;
+  text-align: center;
+  background-color: #f5f8ff;
+  min-height: 100vh;
+  font-family: "Open Sans", sans-serif;
+}
+
+.dashboard-logo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 100px;
+  border-radius: 8px;
+}
+
+.dashboard-content {
+  margin-top: 12px;
+}
+
+.dashboard-content h1 {
+  color: #001a57;
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.dashboard-content p {
+  color: #333;
+  font-size: 1rem;
+  margin-bottom: 30px;
+  margin-top: 10px;
+}
+
+.logout-button {
+  background-color: #0a2a66;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: 0.3s;
+  width: 60%;
+  max-width: 300px;
+}
+
+.logout-button:hover {
+  background-color: #003399;
+}

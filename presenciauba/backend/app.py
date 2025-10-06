@@ -114,5 +114,3 @@ if __name__ == "__main__":
 
 ####hay que hacer una parte que cuando nosotros editemos algo aparesca en la pantalla "En mantenimiento"
 
-
-    0

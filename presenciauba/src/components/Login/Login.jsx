@@ -10,7 +10,7 @@ function Login({ onLogin }) {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://10.56.2.47:5000/login", {
+      const res = await fetch("http://10.56.2.4:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correo, password }),
@@ -31,7 +31,7 @@ function Login({ onLogin }) {
       }
     } catch (err) {
       console.error(err);
-      setError("No se pudo conectar con el backend.");
+      setError("Error de inicio de sesión");
     }
   };
 
@@ -65,8 +65,7 @@ function Login({ onLogin }) {
         {error && <p className="error">{error}</p>}
       </form>
       <footer className="footer-copy">
-        © derechos reservados por la ETEC UBA <br />
-        Hecho por Thiago Gomez y Miguel Díaz
+        © derechos reservados por la ETEC UBA
       </footer>
     </div>
   );
