@@ -23,14 +23,13 @@
   color: #001a57;
   font-size: 1.8rem;
   margin-bottom: 10px;
-  margin-top: 120px;
 }
 
 .dashboard-content p {
   color: #333;
   font-size: 1rem;
   margin-bottom: 30px;
-  margin-top: 120px;
+  margin-top: 10px;
 }
 
 .logout-button {
