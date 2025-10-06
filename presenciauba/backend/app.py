@@ -104,4 +104,3 @@ def actualizar_usuario(id_usuario):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
