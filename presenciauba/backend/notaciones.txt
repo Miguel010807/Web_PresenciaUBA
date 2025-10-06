@@ -1,0 +1,10 @@
+-Route
+
+El Route es para el manejo de las rutas, ejemplo:
+  pasar de /login -----> /dashboard 
+  despues de iniciar sesion
+
+-Local Storage 
+
+  El LocalStorage guarda los datos de forma Local
+  en el navegador del usuario

@@ -55,53 +55,64 @@ def login():
 
 
 #Muestra los usuarios
-@app.route("/usuarios", methods=["GET"]) #Funciona en postman
-def get_usuarios():
-    try:
-        conn = get_connection()
-        with conn.cursor() as cursor:
-            sql = "SELECT id_usuario, nombre, apellido, correo_institucional, rol, estado FROM usuarios"
-            cursor.execute(sql)  
-            usuarios = cursor.fetchall()
-        conn.close()
+# @app.route("/usuarios", methods=["GET"]) #Funciona en postman
+# def get_usuarios():
+#     try:
+#         conn = get_connection()
+#         with conn.cursor() as cursor:
+#             sql = "SELECT id_usuario, nombre, apellido, correo_institucional, rol, estado FROM usuarios"
+#             cursor.execute(sql)  
+#             usuarios = cursor.fetchall()
+#         conn.close()
 
-        return jsonify({
-            "message": "Lista de usuarios",
-            "usuarios": usuarios
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+#         return jsonify({
+#             "message": "Lista de usuarios",
+#             "usuarios": usuarios
+#         })
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+
+# @app.route('/resource/<int:resource_id>', methods=['PUT'])
+# def update_resource(resource_id):
+#     # ... (code to handle the PUT request)
+#     return f"Resource {resource_id} updated successfully."
 
 #Cambiar datos(en este caso, el numero)
 @app.route("/usuarios/<int:id_usuario>", methods=["PUT"]) #hay que probarlo en postman
 def actualizar_usuario(id_usuario):
-    data = request.json
-    nuevo_celular = data.get("celular")
+    # return f"Resource {id_usuario} updated successfully."
 
-    if not nuevo_celular:
+    data = request.json
+    nuevo_numero = data.get("numero")
+
+    print(nuevo_numero)
+    if not nuevo_numero:
         return jsonify({"error": "Falta el número de celular"}), 400
 
     try:
+        db=get_connection()
+        cursor = db.cursor
         # Ver si el usuario existe y qué celular tiene
-        cursor.execute("SELECT celular FROM usuarios WHERE id = %s", (id_usuario,))
-        usuario = cursor.fetchone()
-
-        if not usuario:
+        cursor.execute("SELECT numero FROM usuarios WHERE id = %s", (str(id_usuario,)))
+        numero_celular = cursor.fetchone()
+        print(usuario)
+        if not numero_celular:
             return jsonify({"error": "Usuario no encontrado"}), 404
-
-        if not usuario["celular"] or usuario["celular"].strip() == "":#Este es en el caso que no tenga celular registrado(NULL)
-            cursor.execute("UPDATE usuarios SET celular = %s WHERE id = %s", (nuevo_celular, id_usuario))
-            db.commit()
-            return jsonify({"message": "Celular agregado correctamente"}), 200
-        else:                                                                #Este es en el caso que si tenga celular registrado(1132859054)
-            cursor.execute("UPDATE usuarios SET celular = %s WHERE id = %s", (nuevo_celular, id_usuario))
-            db.commit()
-            return jsonify({"message": "Celular actualizado correctamente"}), 200
+        
+        cursor.execute(f"UPDATE usuarios SET numero = {nuevo_numero} WHERE id={id_usuario}")
+        return jsonify({"message":"Cambio exitoso"}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
+
+
+
+####hay que hacer una parte que cuando nosotros editemos algo aparesca en la pantalla "En mantenimiento"
+
+
+    0
