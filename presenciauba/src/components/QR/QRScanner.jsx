@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { QrReader } from "react-qr-reader";
-import api from "../api";
+import api from "../../api";
 
 function QRScanner() {
   const [resultado, setResultado] = useState("");
