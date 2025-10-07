@@ -24,10 +24,5 @@ para levantar el backend en modo debug
 python app.py --debug
 ```
 
-para levantar react
-```
-npm start
-```
-
 
 (.env) <--- tarea de 8 puntos
