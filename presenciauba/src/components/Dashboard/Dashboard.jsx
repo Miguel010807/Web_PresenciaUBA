@@ -1,24 +1,39 @@
-import "../Dashboard/Dashboard.css";
-import logo from "../../assets/images.jpeg";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 function Dashboard({ usuario, onLogout }) {
+  const [mantenimiento, setMantenimiento] = useState(false);
+
+  // Verifica si el sistema está en mantenimiento
+  useEffect(() => {
+    const checkMantenimiento = async () => {
+      try {
+        const response = await axios.post("http://localhost:5000/mantenimiento");
+        setMantenimiento(false); // Resetear cuando el mantenimiento cambie
+      } catch (error) {
+        if (error.response && error.response.status === 503) {
+          setMantenimiento(true); // El sistema está en mantenimiento
+        }
+      }
+    };
+    
+    checkMantenimiento();
+  }, []);
+
+  if (mantenimiento) {
+    return (
+      <div className="maintenance-message">
+        <h2>El sistema está en mantenimiento. Intente más tarde.</h2>
+      </div>
+    );
+  }
+
   return (
     <div className="dashboard-container">
-      <img src={logo} alt="UBA Técnica" className="dashboard-logo" />
-
-      <div className="dashboard-content">
-        <h1>
-          Bienvenido{" "}
-          {usuario.nombre
-            ? usuario.nombre
-            : usuario.correo_institucional || usuario.correo}
-        </h1>
-        <p>Has iniciado sesión correctamente</p>
-
-        <button onClick={onLogout} className="logout-button">
-          Cerrar sesión
-        </button>
-      </div>
+      <h1>
+        Bienvenido {usuario.nombre || usuario.correo_institucional}
+      </h1>
+      <button onClick={onLogout}>Cerrar sesión</button>
     </div>
   );
 }

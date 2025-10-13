@@ -31,7 +31,7 @@ function Login({ onLogin }) {
       }
     } catch (err) {
       console.error(err);
-      setError("Error de inicio de sesión");
+      setError("Credenciales invalidas.");
     }
   };
 
