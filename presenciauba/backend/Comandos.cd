@@ -5,8 +5,10 @@ python -m venv .venv
 
 Para activar el Entorno Virtual
 ```
-source .venv/bin/activate
+Git Bash: source .venv/bin/activate
+PowerShell: .venv\Scripts\Activate
 ```
+
 
 Instalacion de los Paquetes Requeridos
 ```
