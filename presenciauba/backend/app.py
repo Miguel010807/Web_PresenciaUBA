@@ -6,33 +6,32 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Configuración de la conexión a MySQL
-
 DB_CONFIG = {
     "host": "10.9.120.5",
-    "user": "presencia", #<-- este es el Usuario para entrar al PHP
-    "password": "presencia1234", #<-- este es el Password para entrar al PHP
+    "user": "presencia", # <--- Usuario para entrar a la base
+    "password": "presencia1234", # <--- Contraseña para entrar a la base
     "database": "PresenciaUBA",
-    "port": 3306
-    ,  
+    "port": 3306,
 }
 
-# Función para obtener conexión
+# Función para obtener conexión a la base de datos
 def get_connection():
     return pymysql.connect(**DB_CONFIG)
 
-
-#Validacion de Login
-@app.route("/login", methods=["POST"]) #Funciona en postman
+# Validación de Login (Endpoint POST)
+@app.route("/login", methods=["POST"]) 
 def login():
     data = request.json
     correo = data.get("correo")
     password = data.get("password")
 
     try:
+        # Conexión a la base de datos
         conn = get_connection()
         with conn.cursor() as cursor:
+            # Se consulta el correo y la contraseña, y también el rol
             sql = """
-                SELECT correo_institucional, password
+                SELECT id_usuario, nombre, apellido, correo_institucional, password, rol
                 FROM usuarios
                 WHERE correo_institucional=%s AND password=%s
                 LIMIT 1
@@ -44,12 +43,18 @@ def login():
         if not user:
             return jsonify({"error": "Credenciales inválidas"}), 401
 
+        # Responder con los datos del usuario, incluyendo el rol
         return jsonify({
-               "message": "Login exitoso",
+            "message": "Login exitoso",
             "user": {
-                "correo": user[0],
-                "password": user[1]
-        }})
+                "id_usuario": user[0],
+                "nombre": user[1],
+                "apellido": user[2],
+                "correo_institucional": user[3],
+                "password": user[4],
+                "rol": user[5]  # Aquí se devuelve el rol (Estudiante/Docente)
+            }
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
