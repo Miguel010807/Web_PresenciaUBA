@@ -118,3 +118,8 @@ if __name__ == "__main__":
 
 
 ####hay que hacer una parte que cuando nosotros editemos algo aparesca en la pantalla "En mantenimiento"
+@app.route("/mantenimiento", methods=["POST"])
+def toggle_mantenimiento():
+    global MANTENIMIENTO
+    MANTENIMIENTO = not MANTENIMIENTO  # Cambia el estado de mantenimiento
+    return jsonify({"message": f"El sistema está {'en mantenimiento' if MANTENIMIENTO else 'disponible'}"}), 200
