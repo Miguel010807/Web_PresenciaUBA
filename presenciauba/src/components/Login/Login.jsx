@@ -10,7 +10,7 @@ function Login({ onLogin }) {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://10.56.2.14:5000/login", {
+      const res = await fetch("http://10.56.2.53:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correo, password }),
