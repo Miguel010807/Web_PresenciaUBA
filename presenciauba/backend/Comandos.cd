@@ -29,3 +29,10 @@ python app.py --debug
 
 
 (.env) <--- tarea de 8 puntos
+
+
+Para comentar una linea de python
+
+```
+Ctrl + shift + 7
+```

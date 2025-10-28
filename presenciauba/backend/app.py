@@ -118,26 +118,26 @@ def actualizar_usuario(id_usuario):
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/asistencia", methods=["POST"])
-def registrar_asistencia():
-    try:
-        db=get_connection()
-        data = request.get_json()
-        id_estudiante = data["id_estudiante"]
-        id_clase = data["id_clase"]
-        hora = datetime.now().strftime("%H:%M:%S")
+# @app.route("/asistencia", methods=["POST"])
+# def registrar_asistencia():
+#     try:
+#         db=get_connection()
+#         data = request.get_json()
+#         id_estudiante = data["id_estudiante"]
+#         id_clase = data["id_clase"]
+#         hora = datetime.now().strftime("%H:%M:%S")
 
-        cursor = db.cursor()
-        cursor.execute("""
-            UPDATE asistencia_materia
-            SET estado = 'Presente', hora_ingreso = %s
-            WHERE id_estudiante = %s AND id_clase = %s
-        """, (hora, id_estudiante, id_clase))
-        db.commit()
+#         cursor = db.cursor()
+#         cursor.execute("""
+#             UPDATE asistencia_materia
+#             SET estado = 'Presente', hora_ingreso = %s
+#             WHERE id_estudiante = %s AND id_clase = %s
+#         """, (hora, id_estudiante, id_clase))
+#         db.commit()
 
-        return jsonify({"mensaje": "Asistencia registrada con éxito"})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+#         return jsonify({"mensaje": "Asistencia registrada con éxito"})
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 @app.route("/generar_qr", methods=["POST"])
 def generar_qr():
@@ -171,6 +171,31 @@ def generar_qr():
         "qr_image": qr_base64
     })
 
+@app.route("/registrar_asistencia", methods=["POST"])
+def registrar_asistencia():
+    data = request.get_json()
+    id_usuario = data.get("id_usuario")
+    qr_data = data.get("qr_data")
+    fecha = datetime.now().date()
+    hora = datetime.now().strftime("%H:%M:%S")
+
+    cursor = db.cursor()
+
+    # Supongamos que en el QR viene el id_materia
+    try:
+        db=get_connection()
+        cursor.execute("""
+            INSERT INTO asistencia_materia (id_usuario, id_materia, fecha, hora_registro, qr_validado, dispositivo)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (id_usuario, qr_data, fecha, hora, 1, "Navegador Web"))
+        db.commit()
+        return jsonify({"message": "Asistencia registrada correctamente"}), 200
+    except Exception as e:
+        db.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
 
@@ -178,8 +203,3 @@ if __name__ == "__main__":
 
 
 ####hay que hacer una parte que cuando nosotros editemos algo aparesca en la pantalla "En mantenimiento"
-@app.route("/mantenimiento", methods=["POST"])
-def toggle_mantenimiento():
-    global MANTENIMIENTO
-    MANTENIMIENTO = not MANTENIMIENTO  # Cambia el estado de mantenimiento
-    return jsonify({"message": f"El sistema está {'en mantenimiento' if MANTENIMIENTO else 'disponible'}"}), 200

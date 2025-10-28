@@ -17,5 +17,5 @@ Instalaciones necesarias antes de ejecutar el programa
 ´´´
 npm install react-router-dom
 npm install react-icons
-npm install react-qr-reader
+npm install qr-scanner
 ´´´

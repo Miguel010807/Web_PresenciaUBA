@@ -1,4 +1,10 @@
 import React, { useState } from "react";
+import {
+  Home,
+  QrCode,
+  Clock,
+  LogOut,
+} from "lucide-react"; // <- librería de íconos
 import "./DashboardDocente.css";
 
 function DashboardDocente({ usuario, onLogout }) {
@@ -11,6 +17,7 @@ function DashboardDocente({ usuario, onLogout }) {
 
   const [qrImage, setQrImage] = useState(null);
   const [mensaje, setMensaje] = useState("");
+  const [activeSection, setActiveSection] = useState("home");
 
   // Maneja los cambios en los inputs
   const handleChange = (e) => {
@@ -25,7 +32,7 @@ function DashboardDocente({ usuario, onLogout }) {
     }
 
     try {
-      const res = await fetch("http://10.56.2.53:5000/generar_qr", {
+      const res = await fetch("http://10.56.2.48:5000/generar_qr", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -35,7 +42,7 @@ function DashboardDocente({ usuario, onLogout }) {
 
       if (res.ok) {
         setQrImage(`data:image/png;base64,${data.qr_image}`);
-        setMensaje("QR generado con exito.");
+        setMensaje("QR generado con éxito.");
       } else {
         setMensaje("Error al generar el QR.");
       }
@@ -46,66 +53,115 @@ function DashboardDocente({ usuario, onLogout }) {
   };
 
   return (
-    <div className="dashboard-container">
-      <h1>Bienvenido Docente {usuario.nombre}</h1>
-      <p>Rol: {usuario.rol}</p>
+    <div className="dashboard-layout">
+      {/* Sidebar */}
+      <aside className="sidebar">
+        <h2 className="sidebar-title">Docente</h2>
+        <ul className="sidebar-menu">
+          <li
+            className={activeSection === "home" ? "active" : ""}
+            onClick={() => setActiveSection("home")}
+          >
+            <Home size={20} />
+            <span>Inicio</span>
+          </li>
+          <li
+            className={activeSection === "qr" ? "active" : ""}
+            onClick={() => setActiveSection("qr")}
+          >
+            <QrCode size={20} />
+            <span>Generar QR</span>
+          </li>
+          <li
+            className={activeSection === "historial" ? "active" : ""}
+            onClick={() => setActiveSection("historial")}
+          >
+            <Clock size={20} />
+            <span>Historial</span>
+          </li>
+          <li onClick={onLogout}>
+            <LogOut size={20} />
+            <span>Salir</span>
+          </li>
+        </ul>
+      </aside>
 
-      <button onClick={onLogout}>Cerrar sesión</button>
+      {/* Contenido principal */}
+      <main className="main-content">
+        {activeSection === "home" && (
+          <div>
+            <h1>Bienvenido Docente {usuario.nombre}</h1>
+            <p>Rol: {usuario.rol}</p>
+          </div>
+        )}
 
-      <hr />
+        {activeSection === "qr" && (
+          <div>
+            <h2>Generar QR de Clase</h2>
+            <div className="form-container">
+              <label>Número de Aula:</label>
+              <input
+                type="text"
+                name="numero_aula"
+                value={formData.numero_aula}
+                onChange={handleChange}
+                placeholder="Ej: 203"
+              />
 
-      <h2>Generar QR de Clase</h2>
+              <label>Curso:</label>
+              <select
+                name="curso"
+                value={formData.curso}
+                onChange={handleChange}
+              >
+                <option value="A">5-A</option>
+                <option value="B">5-B</option>
+                <option value="C">5-C</option>
+                <option value="D">5-D</option>
+              </select>
 
-      <div className="form-container">
-        <label>Número de Aula:</label>
-        <input
-          type="text"
-          name="numero_aula"
-          value={formData.numero_aula}
-          onChange={handleChange}
-          placeholder="Ej: 203"
-        />
+              <label>Materia:</label>
+              <input
+                type="text"
+                name="materia"
+                value={formData.materia}
+                onChange={handleChange}
+                placeholder="Ej: Matemática"
+              />
 
-        <label>Curso:</label>
-        <select name="curso" value={formData.curso} onChange={handleChange}>
-          <option value="A">5-A</option>
-          <option value="B">5-B</option>
-          <option value="C">5-C</option>
-          <option value="D">5-D</option>
-        </select>
+              <label>Fecha:</label>
+              <input
+                type="date"
+                name="fecha"
+                value={formData.fecha}
+                onChange={handleChange}
+              />
 
-        <label>Materia:</label>
-        <input
-          type="text"
-          name="materia"
-          value={formData.materia}
-          onChange={handleChange}
-          placeholder="Ej: Matemática"
-        />
+              <button onClick={generarQR}>Generar QR</button>
 
-        <label>Fecha:</label>
-        <input
-          type="date"
-          name="fecha"
-          value={formData.fecha}
-          onChange={handleChange}
-        />
+              {mensaje && <p>{mensaje}</p>}
+            </div>
 
-        <button onClick={generarQR}>Generar QR</button>
+            {qrImage && (
+              <div className="qr-section">
+                <h3>QR Generado:</h3>
+                <img
+                  src={qrImage}
+                  alt="QR generado"
+                  style={{ width: "200px", marginTop: "10px" }}
+                />
+              </div>
+            )}
+          </div>
+        )}
 
-        {mensaje && <p>{mensaje}</p>}
-      </div>
-
-      {qrImage && (
-        <div className="qr-section">
-          <h3>QR Generado:</h3>
-          <img
-            src={qrImage}
-            alt="QR generado"
-            style={{ width: "200px", marginTop: "10px" }}
-          />
-        </div>
-      )}
+        {activeSection === "historial" && (
+          <div>
+            <h2>Historial de QRs generados</h2>
+            <p>📜 Aquí podrías listar los QR guardados desde la base de datos.</p>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
