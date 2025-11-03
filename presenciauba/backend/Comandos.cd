@@ -13,7 +13,7 @@ PowerShell: .venv\Scripts\Activate
 Instalacion de los Paquetes Requeridos
 ```
 pip install flask flask-cors mysql-connector-python
- flask-sqlalchemy flask-jwt-extended pymysql qrcode[pil]
+ flask-sqlalchemy flask-jwt-extended pymysql qrcode[pil] bcrypt pyjwt
 ```
 
 
