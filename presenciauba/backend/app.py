@@ -5,21 +5,25 @@ from datetime import datetime, timedelta
 import qrcode          # Para generar el código QR
 import io              # Para manejar datos en memoria (usado en el buffer de la imagen)
 import base64          # Para convertir la imagen QR a base64
-import jwt
+import os
+from dotenv import load_dotenv
 from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
+import jwt
 
+# Cargar variables del archivo .env
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-# Configuración de la conexión a MySQL
+# Configuración de la conexión a MySQL desde el .env
 DB_CONFIG = {
-    "host": "10.9.120.5",
-    "user": "presencia", # <--- Usuario para entrar a la base
-    "password": "presencia1234", # <--- Contraseña para entrar a la base
-    "database": "PresenciaUBA",
-    "port": 3306,
+    "host": os.getenv("DB_HOST"),
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "database": os.getenv("DB_NAME"),
+    "port": int(os.getenv("DB_PORT", 3306))
 }
 
 # Función para obtener conexión a la base de datos
@@ -153,7 +157,6 @@ def actualizar_usuario(id_usuario):
     data = request.json
     nuevo_numero = data.get("numero")
 
-    print(nuevo_numero)
     if not nuevo_numero:
         return jsonify({"error": "Falta el número de celular"}), 400
 
@@ -254,6 +257,3 @@ def registrar_asistencia():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
-
-

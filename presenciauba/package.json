@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "axios": "^1.12.2",
+    "dotenv": "^17.2.3",
     "lucide-react": "^0.548.0",
     "pymysql": "^1.0.0",
     "qr-scanner": "^1.4.2",
