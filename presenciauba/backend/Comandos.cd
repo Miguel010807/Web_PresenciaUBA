@@ -5,12 +5,15 @@ python -m venv .venv
 
 Para activar el Entorno Virtual
 ```
-source .venv/bin/activate
+Git Bash: source .venv/bin/activate
+PowerShell: .venv\Scripts\Activate
 ```
+
 
 Instalacion de los Paquetes Requeridos
 ```
-pip install flask flask-cors mysql-connector-python flask-sqlalchemy flask-jwt-extended pymysql
+pip install flask flask-cors mysql-connector-python
+ flask-sqlalchemy flask-jwt-extended pymysql qrcode[pil] bcrypt pyjwt
 ```
 
 
@@ -26,3 +29,10 @@ python app.py --debug
 
 
 (.env) <--- tarea de 8 puntos
+
+
+Para comentar una linea de python
+
+```
+Ctrl + shift + 7
+```

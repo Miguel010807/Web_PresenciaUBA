@@ -6,20 +6,19 @@ import {
   Navigate,
 } from "react-router-dom";
 import Login from "./components/Login/Login";
-import Dashboard from "./components/Dashboard/Dashboard"
+import DashboardDocente from "./components/Dashboard/DashboardDocente";
+import DashboardEstudiante from "./components/Dashboard/DashboardEstudiante";
 
 function App() {
   const [usuario, setUsuario] = useState(
     JSON.parse(localStorage.getItem("usuario")) || null
   );
 
-  // Cuando el login es exitoso
   const handleLogin = (user) => {
     setUsuario(user);
     localStorage.setItem("usuario", JSON.stringify(user));
   };
 
-  // Cerrar sesión
   const handleLogout = () => {
     localStorage.removeItem("usuario");
     localStorage.removeItem("token");
@@ -29,24 +28,42 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Ruta de login */}
+        {/* LOGIN */}
         <Route
           path="/"
           element={
             usuario ? (
-              <Navigate to="/dashboard" replace />
+              usuario.rol === "estudiante" ? (
+                <Navigate to="/dashboard-estudiante" replace />
+              ) : usuario.rol === "docente" ? (
+                <Navigate to="/dashboard-docente" replace />
+              ) : (
+                <Navigate to="/" replace />
+              )
             ) : (
               <Login onLogin={handleLogin} />
             )
           }
         />
 
-        {/* Ruta del Dashboard (solo accesible con sesión iniciada) */}
+        {/* DASHBOARD ESTUDIANTE */}
         <Route
-          path="/dashboard"
+          path="/dashboard-estudiante"
           element={
-            usuario ? (
-              <Dashboard usuario={usuario} onLogout={handleLogout} />
+            usuario && usuario.rol === "estudiante" ? (
+              <DashboardEstudiante usuario={usuario} onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+
+        {/* DASHBOARD DOCENTE */}
+        <Route
+          path="/dashboard-docente"
+          element={
+            usuario && usuario.rol === "docente" ? (
+              <DashboardDocente usuario={usuario} onLogout={handleLogout} />
             ) : (
               <Navigate to="/" replace />
             )
