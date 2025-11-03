@@ -4,13 +4,16 @@ import "./Login.css";
 function Login({ onLogin }) {
   const [correo, setCorreo] = useState("");
   const [password, setPassword] = useState("");
+  const [nuevaPassword, setNuevaPassword] = useState("");
   const [error, setError] = useState("");
+  const [mensaje, setMensaje] = useState("");
+  const [mostrarCambio, setMostrarCambio] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://10.56.2.48:5000/login", {
+      const res = await fetch("http://10.56.2.32:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correo, password }),
@@ -26,18 +29,56 @@ function Login({ onLogin }) {
       localStorage.setItem("token", data.token || "");
       localStorage.setItem("usuario", JSON.stringify(data.user));
 
-      if (onLogin) {
-        onLogin(data.user);
-      }
+      if (onLogin) onLogin(data.user);
+
+      setMostrarCambio(true); // ✅ Mostrar el formulario de cambio
+      setMensaje("Inicio de sesión exitoso");
+      setError("");
     } catch (err) {
       console.error(err);
-      setError("Credenciales invalidas.");
+      setError("Credenciales inválidas.");
+    }
+  };
+
+  const handleCambioPassword = async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("No hay token de sesión");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://10.56.2.32:5000/cambiar_contraseña", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ nueva_contraseña: nuevaPassword }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "No se pudo cambiar la contraseña");
+        return;
+      }
+
+      setMensaje(data.mensaje || "Contraseña actualizada correctamente");
+      setError("");
+      setNuevaPassword("");
+    } catch (err) {
+      console.error(err);
+      setError("Error en la conexión");
     }
   };
 
   return (
     <div className="login-container">
       <h2 className="login-titulo">Presencia UBA</h2>
+
       <form onSubmit={handleSubmit} className="login-form">
         <div className="form-group">
           <label htmlFor="correo">Correo institucional:</label>
@@ -63,7 +104,27 @@ function Login({ onLogin }) {
         </div>
         <button type="submit">Iniciar sesión</button>
         {error && <p className="error">{error}</p>}
+        {mensaje && <p className="mensaje">{mensaje}</p>}
       </form>
+
+      {mostrarCambio && (
+        <form onSubmit={handleCambioPassword} className="login-form">
+          <h3>Cambiar contraseña</h3>
+          <div className="form-group">
+            <label htmlFor="nuevaPassword">Nueva contraseña:</label>
+            <input
+              id="nuevaPassword"
+              type="password"
+              placeholder="Ingrese la nueva contraseña"
+              value={nuevaPassword}
+              onChange={(e) => setNuevaPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit">Guardar nueva contraseña</button>
+        </form>
+      )}
+
       <footer className="footer-copy">
         © derechos reservados por la ETEC UBA
       </footer>

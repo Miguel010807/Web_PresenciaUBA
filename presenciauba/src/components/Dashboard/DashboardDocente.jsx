@@ -1,11 +1,7 @@
 import React, { useState } from "react";
-import {
-  Home,
-  QrCode,
-  Clock,
-  LogOut,
-} from "lucide-react"; // <- librería de íconos
+import { Home, QrCode, Clock, LogOut } from "lucide-react"; // <- librería de íconos
 import "./DashboardDocente.css";
+import CambiarContraseña from "../CambiarContraseña";
 
 function DashboardDocente({ usuario, onLogout }) {
   const [formData, setFormData] = useState({
@@ -32,7 +28,7 @@ function DashboardDocente({ usuario, onLogout }) {
     }
 
     try {
-      const res = await fetch("http://10.56.2.48:5000/generar_qr", {
+      const res = await fetch("http://10.56.2.32:5000/generar_qr", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -78,6 +74,12 @@ function DashboardDocente({ usuario, onLogout }) {
           >
             <Clock size={20} />
             <span>Historial</span>
+          </li>
+          <li
+            className={activeSection === "config" ? "active" : ""}
+            onClick={() => setActiveSection("config")}
+          >
+            <span>Configuración</span>
           </li>
           <li onClick={onLogout}>
             <LogOut size={20} />
@@ -158,7 +160,15 @@ function DashboardDocente({ usuario, onLogout }) {
         {activeSection === "historial" && (
           <div>
             <h2>Historial de QRs generados</h2>
-            <p>📜 Aquí podrías listar los QR guardados desde la base de datos.</p>
+            <p>
+              📜 Aquí podrías listar los QR guardados desde la base de datos.
+            </p>
+          </div>
+        )}
+        {activeSection === "config" && (
+          <div>
+            <h2>⚙️ Configuración</h2>
+            <CambiarContraseña usuario={usuario} />
           </div>
         )}
       </main>

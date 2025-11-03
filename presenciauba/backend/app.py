@@ -1,10 +1,13 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pymysql
-from datetime import datetime
+from datetime import datetime, timedelta
 import qrcode          # Para generar el código QR
 import io              # Para manejar datos en memoria (usado en el buffer de la imagen)
 import base64          # Para convertir la imagen QR a base64
+import jwt
+from werkzeug.security import check_password_hash, generate_password_hash
+from functools import wraps
 
 
 app = Flask(__name__)
@@ -62,6 +65,59 @@ def login():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# --- Middleware para verificar JWT ---
+def token_requerido(f):
+    @wraps(f)
+    def decorador(*args, **kwargs):
+        token = None
+        if "Authorization" in request.headers:
+            token = request.headers["Authorization"].split(" ")[1]
+        if not token:
+            return jsonify({"message": "Token faltante"}), 401
+
+        try:
+            data = jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
+            usuario_id = data["id"]
+        except Exception as e:
+            print("Error JWT:", e)
+            return jsonify({"message": "Token inválido"}), 401
+
+        return f(usuario_id, *args, **kwargs)
+    return decorador
+
+
+# --- Endpoint para cambiar contraseña ---
+@app.route("/cambiar_contrasena", methods=["POST"])
+@token_requerido
+def cambiar_contrasena(usuario_id):
+    db=get_connection
+    data = request.get_json()
+    actual = data.get("actual")
+    nueva = data.get("nueva")
+
+    if not actual or not nueva:
+        return jsonify({"message": "Faltan datos"}), 400
+
+    cursor = db.cursor()
+    cursor.execute("SELECT password FROM usuarios WHERE id_usuario = %s", (usuario_id,))
+    usuario = cursor.fetchone()
+
+    if not usuario:
+        return jsonify({"message": "Usuario no encontrado"}), 404
+
+    password_bd = usuario[0]
+
+    # Si la contraseña aún no está hasheada (ej: 'nombre1234'), se permite esa comparación directa
+    if password_bd == actual or check_password_hash(password_bd, actual):
+        nueva_hash = generate_password_hash(nueva)
+        cursor.execute(
+            "UPDATE usuarios SET password = %s WHERE id_usuario = %s", (nueva_hash, usuario_id)
+        )
+        db.commit()
+        return jsonify({"message": "Contraseña actualizada correctamente"}), 200
+    else:
+        return jsonify({"message": "Contraseña actual incorrecta"}), 400
 
 
 #Muestra los usuarios

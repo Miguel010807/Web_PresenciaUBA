@@ -1,7 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import QrScanner from "qr-scanner";
-import { FaHome, FaHistory, FaQrcode, FaCog, FaSignOutAlt } from "react-icons/fa";
+import {
+  FaHome,
+  FaHistory,
+  FaQrcode,
+  FaCog,
+  FaSignOutAlt,
+} from "react-icons/fa";
 import "./DashboardEstudiante.css";
+import CambiarContraseña from "../CambiarContraseña";
 
 function DashboardEstudiante({ usuario, onLogout }) {
   const [escaneando, setEscaneando] = useState(false);
@@ -19,15 +26,18 @@ function DashboardEstudiante({ usuario, onLogout }) {
             try {
               const dataQR = JSON.parse(result.data);
 
-              const res = await fetch("http://10.56.2.48:5000/registrar_asistencia", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  id_usuario: usuario.id,
-                  id_materia: dataQR.id_materia,
-                  dispositivo: "web",
-                }),
-              });
+              const res = await fetch(
+                "http://10.56.2.32:5000/registrar_asistencia",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    id_usuario: usuario.id,
+                    id_materia: dataQR.id_materia,
+                    dispositivo: "web",
+                  }),
+                }
+              );
 
               const data = await res.json();
               setMensaje(data.message);
@@ -58,7 +68,10 @@ function DashboardEstudiante({ usuario, onLogout }) {
       <aside className="sidebar">
         <h2 className="sidebar-title">Estudiante</h2>
         <ul className="sidebar-menu">
-          <li className={vista === "home" ? "active" : ""} onClick={() => setVista("home")}>
+          <li
+            className={vista === "home" ? "active" : ""}
+            onClick={() => setVista("home")}
+          >
             <FaHome size={18} />
             <span>Inicio</span>
           </li>
@@ -94,7 +107,9 @@ function DashboardEstudiante({ usuario, onLogout }) {
       <main className="main-content">
         <h1>Bienvenido, {usuario.nombre}</h1>
 
-        {vista === "home" && <p>Seleccioná una opción del menú para comenzar.</p>}
+        {vista === "home" && (
+          <p>Seleccioná una opción del menú para comenzar.</p>
+        )}
 
         {vista === "escanear" && (
           <div className="qr-section">
@@ -104,8 +119,14 @@ function DashboardEstudiante({ usuario, onLogout }) {
               </button>
             ) : (
               <div>
-                <video ref={videoRef} style={{ width: "100%", borderRadius: "8px" }} />
-                <button className="btn cancel" onClick={() => setEscaneando(false)}>
+                <video
+                  ref={videoRef}
+                  style={{ width: "100%", borderRadius: "8px" }}
+                />
+                <button
+                  className="btn cancel"
+                  onClick={() => setEscaneando(false)}
+                >
                   Cancelar
                 </button>
               </div>
@@ -117,14 +138,17 @@ function DashboardEstudiante({ usuario, onLogout }) {
         {vista === "historial" && (
           <div>
             <h2>📜 Historial de asistencias</h2>
-            <p>(Acá se mostrarán las asistencias registradas desde la base de datos.)</p>
+            <p>
+              (Acá se mostrarán las asistencias registradas desde la base de
+              datos.)
+            </p>
           </div>
         )}
 
         {vista === "config" && (
           <div>
             <h2>⚙️ Configuración</h2>
-            <p>Próximamente podrás ajustar tus preferencias aquí.</p>
+            <CambiarContraseña usuario={usuario} />
           </div>
         )}
       </main>
