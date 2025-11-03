@@ -2,14 +2,14 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pymysql
 from datetime import datetime, timedelta
-import qrcode          # Para generar el código QR
-import io              # Para manejar datos en memoria (usado en el buffer de la imagen)
-import base64          # Para convertir la imagen QR a base64
-import os
 from dotenv import load_dotenv
 from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
 import jwt
+import os
+import qrcode # Para generar el código QR 
+import io # Para manejar datos en memoria (usado en el buffer de la imagen) 
+import base64
 
 # Cargar variables del archivo .env
 load_dotenv()
@@ -17,7 +17,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-# Configuración de la conexión a MySQL desde el .env
+# Configuración de la conexión a MySQL
 DB_CONFIG = {
     "host": os.getenv("DB_HOST"),
     "user": os.getenv("DB_USER"),
@@ -26,18 +26,18 @@ DB_CONFIG = {
     "port": int(os.getenv("DB_PORT", 3306))
 }
 
-# Función para obtener conexión a la base de datos
 def get_connection():
     return pymysql.connect(**DB_CONFIG)
 
-
-load_dotenv()
+# Configuración JWT
 JWT_SECRET = os.getenv("JWT_SECRET", "mi_secreto_superseguro")
+app.config["SECRET_KEY"] = JWT_SECRET   # ✅ Usar misma clave en todo el backend
 JWT_ALGORITHM = "HS256"
 JWT_EXP_DELTA_SECONDS = 3600  # 1 hora
 
-# Validación de Login (Endpoint POST)
-@app.route("/login", methods=["POST"]) 
+
+# ------------------ LOGIN ------------------
+@app.route("/login", methods=["POST"])
 def login():
     data = request.json
     correo = data.get("correo")
@@ -49,14 +49,28 @@ def login():
             sql = """
                 SELECT id_usuario, nombre, apellido, correo_institucional, password, rol
                 FROM usuarios
-                WHERE correo_institucional=%s AND password=%s
+                WHERE correo_institucional=%s
                 LIMIT 1
             """
-            cursor.execute(sql, (correo, password))
+            cursor.execute(sql, (correo,))
             user = cursor.fetchone()
         conn.close()
 
+        # Si no existe el usuario
         if not user:
+            return jsonify({"error": "Credenciales inválidas"}), 401
+
+        password_bd = user[4]
+
+        # ✅ Compatibilidad: si la contraseña aún no está hasheada (texto plano)
+        if password_bd == password:
+            pass  # login permitido
+
+        # ✅ Si está hasheada, usar check_password_hash
+        elif check_password_hash(password_bd, password):
+            pass  # login permitido
+
+        else:
             return jsonify({"error": "Credenciales inválidas"}), 401
 
         # Generar el JWT
@@ -69,7 +83,7 @@ def login():
 
         return jsonify({
             "message": "Login exitoso",
-            "token": token,  # <-- enviamos el JWT
+            "token": token,
             "user": {
                 "id_usuario": user[0],
                 "nombre": user[1],
@@ -78,35 +92,46 @@ def login():
                 "rol": user[5]
             }
         })
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# --- Middleware para verificar JWT ---
+
+
+# ------------------ MIDDLEWARE JWT ------------------
 def token_requerido(f):
     @wraps(f)
     def decorador(*args, **kwargs):
         token = None
+
         if "Authorization" in request.headers:
             token = request.headers["Authorization"].split(" ")[1]
+
         if not token:
             return jsonify({"message": "Token faltante"}), 401
 
         try:
-            data = jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
-            usuario_id = data["id"]
+            data = jwt.decode(
+                token,
+                app.config["SECRET_KEY"],   # Ahora usa la misma clave
+                algorithms=[JWT_ALGORITHM]
+            )
+            usuario_id = data["id_usuario"]
+
         except Exception as e:
             print("Error JWT:", e)
             return jsonify({"message": "Token inválido"}), 401
 
         return f(usuario_id, *args, **kwargs)
+
     return decorador
 
 
-# --- Endpoint para cambiar contraseña ---
+# ------------------ CAMBIAR CONTRASEÑA ------------------
 @app.route("/cambiar_contrasena", methods=["POST"])
 @token_requerido
 def cambiar_contrasena(usuario_id):
-    db=get_connection()
+    db = get_connection()
     data = request.get_json()
     actual = data.get("actual")
     nueva = data.get("nueva")
@@ -123,16 +148,18 @@ def cambiar_contrasena(usuario_id):
 
     password_bd = usuario[0]
 
-    # Si la contraseña aún no está hasheada (ej: 'nombre1234'), se permite esa comparación directa
+    # si la contraseña está hasheada o no
     if password_bd == actual or check_password_hash(password_bd, actual):
         nueva_hash = generate_password_hash(nueva)
         cursor.execute(
-            "UPDATE usuarios SET password = %s WHERE id_usuario = %s", (nueva_hash, usuario_id)
+            "UPDATE usuarios SET password = %s WHERE id_usuario = %s",
+            (nueva_hash, usuario_id)
         )
         db.commit()
         return jsonify({"message": "Contraseña actualizada correctamente"}), 200
     else:
         return jsonify({"message": "Contraseña actual incorrecta"}), 400
+
 
 
 #Muestra los usuarios
