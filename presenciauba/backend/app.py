@@ -30,6 +30,12 @@ DB_CONFIG = {
 def get_connection():
     return pymysql.connect(**DB_CONFIG)
 
+
+load_dotenv()
+JWT_SECRET = os.getenv("JWT_SECRET", "mi_secreto_superseguro")
+JWT_ALGORITHM = "HS256"
+JWT_EXP_DELTA_SECONDS = 3600  # 1 hora
+
 # Validación de Login (Endpoint POST)
 @app.route("/login", methods=["POST"]) 
 def login():
@@ -38,10 +44,8 @@ def login():
     password = data.get("password")
 
     try:
-        # Conexión a la base de datos
         conn = get_connection()
         with conn.cursor() as cursor:
-            # Se consulta el correo y la contraseña, y también el rol
             sql = """
                 SELECT id_usuario, nombre, apellido, correo_institucional, password, rol
                 FROM usuarios
@@ -55,16 +59,23 @@ def login():
         if not user:
             return jsonify({"error": "Credenciales inválidas"}), 401
 
-        # Responder con los datos del usuario, incluyendo el rol
+        # Generar el JWT
+        payload = {
+            "id_usuario": user[0],
+            "rol": user[5],
+            "exp": datetime.utcnow() + timedelta(seconds=JWT_EXP_DELTA_SECONDS)
+        }
+        token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
         return jsonify({
             "message": "Login exitoso",
+            "token": token,  # <-- enviamos el JWT
             "user": {
                 "id_usuario": user[0],
                 "nombre": user[1],
                 "apellido": user[2],
                 "correo_institucional": user[3],
-                "password": user[4],
-                "rol": user[5]  # Aquí se devuelve el rol (Estudiante/Docente)
+                "rol": user[5]
             }
         })
     except Exception as e:
@@ -95,7 +106,7 @@ def token_requerido(f):
 @app.route("/cambiar_contrasena", methods=["POST"])
 @token_requerido
 def cambiar_contrasena(usuario_id):
-    db=get_connection
+    db=get_connection()
     data = request.get_json()
     actual = data.get("actual")
     nueva = data.get("nueva")
