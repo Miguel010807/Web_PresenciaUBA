@@ -31,7 +31,7 @@ def get_connection():
 
 # Configuración JWT
 JWT_SECRET = os.getenv("JWT_SECRET", "mi_secreto_superseguro")
-app.config["SECRET_KEY"] = JWT_SECRET   # ✅ Usar misma clave en todo el backend
+app.config["SECRET_KEY"] = JWT_SECRET   # Usar misma clave en todo el backend
 JWT_ALGORITHM = "HS256"
 JWT_EXP_DELTA_SECONDS = 3600  # 1 hora
 
@@ -294,4 +294,9 @@ def registrar_asistencia():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        debug=True,
+        ssl_context=("certs/cert.crt", "certs/cert.key")
+    )

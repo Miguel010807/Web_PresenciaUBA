@@ -95,3 +95,25 @@ body,
   margin-top: 15px;
   font-weight: bold;
 }
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  color: #888;
+}
+
+.divider hr {
+  flex: 1;
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.divider span {
+  margin: 0 10px;
+  font-weight: bold;
+}
+
+.facebook-btn {
+  width: 100%;
+  margin-top: 10px;
+}

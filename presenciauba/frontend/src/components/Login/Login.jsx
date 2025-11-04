@@ -1,3 +1,4 @@
+import FacebookLogin from "./FacebookLogin"; // ajustá la ruta si está en otra carpeta
 import { useState } from "react";
 import "./Login.css";
 
@@ -31,7 +32,7 @@ function Login({ onLogin }) {
 
       if (onLogin) onLogin(data.user);
 
-      setMostrarCambio(true); // ✅ Mostrar el formulario de cambio
+      setMostrarCambio(true); // Mostrar el formulario de cambio
       setMensaje("Inicio de sesión exitoso");
       setError("");
     } catch (err) {
@@ -103,6 +104,31 @@ function Login({ onLogin }) {
           />
         </div>
         <button type="submit">Iniciar sesión</button>
+{/* --- Agregamos login con Facebook --- */}
+<div className="divider">
+  <hr />
+  <span>o</span>
+  <hr />
+</div>
+
+<FacebookLogin
+  onLoginSuccess={(data) => {
+    console.log("Inicio de sesión con Facebook exitoso:", data);
+
+    // Guardamos el token que viene desde Flask (si lo envía)
+    localStorage.setItem("token", data.access_token || "");
+
+    // También podrías simular un usuario con rol
+    localStorage.setItem(
+      "usuario",
+      JSON.stringify({ nombre: "Usuario Facebook", rol: data.role })
+    );
+
+    if (onLogin) onLogin({ nombre: "Usuario Facebook", rol: data.role });
+  }}
+  sizeClass="facebook-btn"
+/>
+
         {error && <p className="error">{error}</p>}
         {mensaje && <p className="mensaje">{mensaje}</p>}
       </form>
