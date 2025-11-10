@@ -272,23 +272,47 @@ def generar_qr():
 def registrar_asistencia():
     data = request.get_json()
     id_usuario = data.get("id_usuario")
-    qr_data = data.get("qr_data")
+    qr_data = data.get("qr_data")  # Podría ser el id_materia o un string tipo "idMateria|curso|fecha"
     fecha = datetime.now().date()
     hora = datetime.now().strftime("%H:%M:%S")
 
-    cursor = db.cursor()
-
-    # Supongamos que en el QR viene el id_materia
     try:
-        db=get_connection()
+        db = get_connection()
+        cursor = db.cursor()
+
+        # Si el QR trae directamente el id_materia:
+        id_materia = int(qr_data)
+
+        # Verificamos si ya existe asistencia registrada para ese usuario/materia/fecha
         cursor.execute("""
-            INSERT INTO asistencia_materia (id_usuario, id_materia, fecha, hora_registro, qr_validado, dispositivo)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (id_usuario, qr_data, fecha, hora, 1, "Navegador Web"))
+            SELECT id_asistencia_materia FROM asistencia_materia
+            WHERE id_usuario = %s AND id_materia = %s AND fecha = %s
+        """, (id_usuario, id_materia, fecha))
+        existente = cursor.fetchone()
+
+        if existente:
+            # Ya existe → solo actualizamos el estado
+            cursor.execute("""
+                UPDATE asistencia_materia
+                SET qr_validado = 1, hora_registro = %s, dispositivo = %s
+                WHERE id_usuario = %s AND id_materia = %s AND fecha = %s
+            """, (hora, "Navegador Web", id_usuario, id_materia, fecha))
+        else:
+            # No existe → insertamos nuevo registro
+            cursor.execute("""
+                INSERT INTO asistencia_materia (id_usuario, id_materia, fecha, hora_registro, qr_validado, dispositivo)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (id_usuario, id_materia, fecha, hora, 1, "Navegador Web"))
+
         db.commit()
-        return jsonify({"message": "Asistencia registrada correctamente"}), 200
+        cursor.close()
+        db.close()
+
+        return jsonify({"message": "✅ Asistencia registrada correctamente"}), 200
+
     except Exception as e:
         db.rollback()
+        print("Error al registrar asistencia:", e)
         return jsonify({"error": str(e)}), 500
 
 
