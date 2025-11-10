@@ -15,6 +15,22 @@ import base64
 load_dotenv()
 
 app = Flask(__name__)
+
+ 
+    # Configuración de CORS
+CORS(
+        app, 
+        # Añadimos la IP de la red por si el navegador la usa
+        resources={r"/*": {"origins": [
+            "https://localhost:5173", 
+            "https://127.0.0.1:5173",
+            "https://192.168.0.110:5173" 
+        ]}},
+        allow_headers=["Content-Type", "Authorization"], 
+        supports_credentials=True, 
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    )
+
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Configuración de la conexión a MySQL
@@ -308,7 +324,7 @@ def registrar_asistencia():
         cursor.close()
         db.close()
 
-        return jsonify({"message": "✅ Asistencia registrada correctamente"}), 200
+        return jsonify({"message": "Asistencia registrada correctamente"}), 200
 
     except Exception as e:
         db.rollback()
@@ -324,3 +340,4 @@ if __name__ == "__main__":
         debug=True,
         ssl_context=("certs/cert.crt", "certs/cert.key")
     )
+

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios"; 
 
 // CRÍTICO: Usamos HTTPS para el backend de Flask 
-const API_BASE_URL = "https://localhost:5000"; 
+const API_BASE_URL = "https://localhost:5173"; 
 // CRÍTICO: Usamos el APP_ID configurado en tu aplicación de Facebook
 const APP_ID = "837039822045468"; 
 
