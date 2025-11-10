@@ -32,3 +32,4 @@ def test_actualizar_usuario_en_mantenimiento(client, mocker):
 
     assert response.status_code == 503
     assert "mantenimiento" in data["message"].lower()
+0.+306

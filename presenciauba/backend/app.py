@@ -62,11 +62,11 @@ def login():
 
         password_bd = user[4]
 
-        # ✅ Compatibilidad: si la contraseña aún no está hasheada (texto plano)
+        #  Compatibilidad: si la contraseña aún no está hasheada (texto plano)
         if password_bd == password:
             pass  # login permitido
 
-        # ✅ Si está hasheada, usar check_password_hash
+        # Si está hasheada, usar check_password_hash
         elif check_password_hash(password_bd, password):
             pass  # login permitido
 
