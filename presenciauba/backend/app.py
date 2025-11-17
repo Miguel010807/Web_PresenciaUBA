@@ -333,11 +333,14 @@ def registrar_asistencia():
 
 
 
+
+
+
 if __name__ == "__main__":
-    app.run(
-        host="0.0.0.0",
-        port=5000,
-        debug=True,
-        ssl_context=("certs/cert.crt", "certs/cert.key")
-    )
+
+    app.run(host="0.0.0.0", port=5000, debug=True)
+
+
+
+
 
