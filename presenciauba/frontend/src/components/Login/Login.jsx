@@ -14,7 +14,7 @@ function Login({ onLogin }) {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://10.56.2.32:5000/login", {
+      const res = await fetch("http://10.56.2.58:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correo, password }),
@@ -51,7 +51,7 @@ function Login({ onLogin }) {
     }
 
     try {
-      const res = await fetch("http://10.56.2.32:5000/cambiar_contraseña", {
+      const res = await fetch("http://10.56.2.58:5000/cambiar_contraseña", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

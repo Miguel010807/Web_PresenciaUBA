@@ -1,15 +1,13 @@
 import pytest
-import pymysql
-from unittest.mock import patch
-from app import app, get_connection
+from unittest.mock import patch, MagicMock
+from app import app
 
 
 @pytest.fixture
 def client():
     """
-    Crea un cliente de prueba para pytest.
-    Además pone el backend en modo TESTING.
-"""
+    Cliente de pruebas para Flask.
+    """
     app.config["TESTING"] = True
 
     with app.test_client() as client:
@@ -19,14 +17,18 @@ def client():
 @pytest.fixture
 def mock_db():
     """
-    Mockea la conexión MySQL para evitar usar la base real.
-    Reemplaza get_connection() por un objeto falso.
-"""
-    with patch("app.get_connection") as mock_conn:
-        # objeto conexión falso
-        mock_connection = patch("pymysql.connect").start()
+    Mockea get_connection() y pymysql.connect.
+    Crea una conexión y cursor falsos totalmente funcionales.
+    """
+    # Creamos objetos falsos
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
 
-        mock_conn.return_value = mock_connection
-        yield mock_connection
+    # El cursor del mock debe devolver el mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
 
-        patch.stopall()
+    # Para endpoints con get_connection()
+    with patch("app.get_connection", return_value=mock_conn):
+        # Para endpoints que usan pymysql.connect directamente
+        with patch("pymysql.connect", return_value=mock_conn):
+            yield mock_conn

@@ -10,6 +10,8 @@ import os
 import qrcode # Para generar el código QR 
 import io # Para manejar datos en memoria (usado en el buffer de la imagen) 
 import base64
+import uuid
+
 
 # Cargar variables del archivo .env
 load_dotenv()
@@ -255,13 +257,28 @@ def actualizar_usuario(id_usuario):
 @app.route("/generar_qr", methods=["POST"])
 def generar_qr():
     data = request.get_json()
+
     numero_aula = data["numero_aula"]
     curso = data["curso"]
     materia = data["materia"]
     fecha = data["fecha"]
 
-    # Contenido del QR
-    contenido = f"Aula: {numero_aula}, Curso: {curso}, Materia: {materia}, Fecha: {fecha}"
+    # Crear ID único de clase
+    id_clase = str(uuid.uuid4())
+
+    # Guardar el QR creado en la base de datos
+    db = get_connection()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        INSERT INTO registro_qr (id, numero_aula, curso, materia, fecha, fecha_creacion)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """, (id_clase, numero_aula, curso, materia, fecha, datetime.now().strftime("%H:%M:%S")))
+
+    db.commit()
+
+    # Contenido del QR → SOLO contiene el id_clase para que el alumno lo escanee
+    contenido = id_clase
 
     # Generar QR como imagen base64
     qr_img = qrcode.make(contenido)
@@ -269,20 +286,7 @@ def generar_qr():
     qr_img.save(buffer, format="PNG")
     qr_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-    # Guardar en MySQL
-    conn = pymysql.connect(**DB_CONFIG)
-    cursor = conn.cursor()
-    cursor.execute("""
-        INSERT INTO registro_qr (numero_aula, curso, materia, fecha, qr_contenido)
-        VALUES (%s, %s, %s, %s, %s)
-    """, (numero_aula, curso, materia, fecha, contenido))
-    conn.commit()
-    conn.close()
-
-    return jsonify({
-        "message": "QR generado exitosamente",
-        "qr_image": qr_base64
-    })
+    return jsonify({"qr": qr_base64, "id": id_clase})
 
 @app.route("/registrar_asistencia", methods=["POST"])
 def registrar_asistencia():

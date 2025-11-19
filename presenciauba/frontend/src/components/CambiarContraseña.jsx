@@ -11,11 +11,11 @@ function CambiarContraseña({ usuario }) {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://10.56.2.32:5000/cambiar_contrasena", {
+      const res = await fetch("http://10.56.2.58:5000/cambiar_contrasena", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // el token que esta aca es como un pasaporte, si no te genera el token no podes pasar al dashboard
         },
         body: JSON.stringify({
           id_usuario: usuario.id_usuario ,

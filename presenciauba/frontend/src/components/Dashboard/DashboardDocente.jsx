@@ -28,7 +28,7 @@ function DashboardDocente({ usuario, onLogout }) {
     }
 
     try {
-      const res = await fetch("http://10.56.2.32:5000/generar_qr", {
+      const res = await fetch("http://10.56.2.58:5000/generar_qr", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

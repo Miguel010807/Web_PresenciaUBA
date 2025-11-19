@@ -28,7 +28,7 @@ function EscanearQR({ usuario }) {
 
   const registrarAsistencia = async (qrData) => {
     try {
-      const response = await fetch("http://10.56.2.48:5000/registrar_asistencia", {
+      const response = await fetch("http://10.56.2.58:5000/registrar_asistencia", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

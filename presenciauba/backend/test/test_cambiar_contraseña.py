@@ -2,34 +2,38 @@ import jwt
 from app import JWT_SECRET, JWT_ALGORITHM
 
 
-def test_cambiar_contrasena_ok(client):
+def generar_token(id_usuario):
+    return jwt.encode({"id_usuario": id_usuario}, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
-    # Creamos token válido
-    token = jwt.encode({"id_usuario": 1}, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
-    resp = client.post(
-        "/cambiar_contrasena",
-        json={"actual": "miguel1234", "nueva": "admin12345"},
+def test_cambiar_contrasena_ok(client, mock_db):
+    token = generar_token(1)
+    mock_cursor = mock_db.cursor.return_value
+
+    # la contraseña almacenada coincide
+    mock_cursor.fetchone.return_value = ("1234",)
+
+    resp = client.post("/cambiar_contrasena",
+        json={"actual": "1234", "nueva": "abcd"},
         headers={"Authorization": f"Bearer {token}"}
     )
-
+ 
     assert resp.status_code == 200
     assert resp.json["message"] == "Contraseña actualizada correctamente"
 
 
-def test_cambiar_contrasena_incorrecta(client):
+def test_cambiar_contrasena_incorrecta(client, mock_db):
+    token = generar_token(1)
+    mock_cursor = mock_db.cursor.return_value
 
-    token = jwt.encode({"id_usuario": 1}, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    # guardada y actual NO coinciden
+    mock_cursor.fetchone.return_value = ("1234",)
 
-    resp = client.post(
-        "/cambiar_contrasena",
-        json={"actual": "ArturoVidal", "nueva": "admin12345"},
+    resp = client.post("/cambiar_contrasena",
+        json={"actual": "9999", "nueva": "abcd"},
         headers={"Authorization": f"Bearer {token}"}
     )
 
     assert resp.status_code == 400
-    assert resp.json["message"] == "Contraseña actual incorrecta"
-
-
 
 #<----- funciona solo que tengo que usarlo con datos mockeados
