@@ -256,43 +256,46 @@ def actualizar_usuario(id_usuario):
 
 @app.route("/generar_qr", methods=["POST"])
 def generar_qr():
-    data = request.get_json()
+    try:
+        data = request.get_json()
 
-    numero_aula = data["numero_aula"]
-    curso = data["curso"]
-    materia = data["materia"]
-    fecha = data["fecha"]
+        numero_aula = data["numero_aula"]
+        curso = data["curso"]
+        materia = data["materia"]
+        fecha = data["fecha"]
 
-    # Crear ID único de clase
-    id_clase = str(uuid.uuid4())
+        id_clase = str(uuid.uuid4())
 
-    # Guardar el QR creado en la base de datos
-    db = get_connection()
-    cursor = db.cursor()
+        db = get_connection()
+        cursor = db.cursor()
 
-    cursor.execute("""
-        INSERT INTO registro_qr (id, numero_aula, curso, materia, fecha, fecha_creacion)
-        VALUES (%s, %s, %s, %s, %s, %s)
-    """, (id_clase, numero_aula, curso, materia, fecha, datetime.now().strftime("%H:%M:%S")))
+        cursor.execute("""
+            INSERT INTO registro_qr (id, numero_aula, curso, materia, fecha, fecha_creacion)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (id_clase, numero_aula, curso, materia, fecha, datetime.now().strftime("%H:%M:%S")))
 
-    db.commit()
+        db.commit()
 
-    # Contenido del QR → SOLO contiene el id_clase para que el alumno lo escanee
-    contenido = id_clase
+        url_qr = f"https://http://10.56.2.56:5000/registrar_asistencia?id={id_clase}"
 
-    # Generar QR como imagen base64
-    qr_img = qrcode.make(contenido)
-    buffer = io.BytesIO()
-    qr_img.save(buffer, format="PNG")
-    qr_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+        qr_img = qrcode.make(url_qr)
+        buffer = io.BytesIO()
+        qr_img.save(buffer, format="PNG")
+        qr_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-    return jsonify({"qr": qr_base64, "id": id_clase})
+        return jsonify({"qr": qr_base64, "id": id_clase})
+
+    except Exception as e:
+        print("Error interno:", e)
+        return jsonify({"error": "Error interno"}), 500
 
 @app.route("/registrar_asistencia", methods=["POST"])
 def registrar_asistencia():
+    # Obtener el id_clase desde el query string
+    id_clase = request.args.get('id')  # id_clase viene desde la URL, por ejemplo, ?id=ID_CLASE
+    
     data = request.get_json()
     id_usuario = data.get("id_usuario")
-    qr_data = data.get("qr_data")  # Podría ser el id_materia o un string tipo "idMateria|curso|fecha"
     fecha = datetime.now().date()
     hora = datetime.now().strftime("%H:%M:%S")
 
@@ -300,8 +303,16 @@ def registrar_asistencia():
         db = get_connection()
         cursor = db.cursor()
 
-        # Si el QR trae directamente el id_materia:
-        id_materia = int(qr_data)
+        # Buscar la materia asociada a ese id_clase (asumimos que id_clase corresponde a una materia)
+        cursor.execute("""
+            SELECT id_materia FROM clases WHERE id = %s
+        """, (id_clase,))
+        clase = cursor.fetchone()
+
+        if not clase:
+            return jsonify({"error": "Clase no encontrada"}), 404
+
+        id_materia = clase[0]  # Tomamos el id_materia asociado al id_clase
 
         # Verificamos si ya existe asistencia registrada para ese usuario/materia/fecha
         cursor.execute("""
