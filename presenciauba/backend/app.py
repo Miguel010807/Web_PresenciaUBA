@@ -276,7 +276,7 @@ def generar_qr():
 
         db.commit()
 
-        url_qr = f"https://http://10.56.2.56:5000/registrar_asistencia?id={id_clase}"
+        url_qr = f"http://10.56.2.56:5000/registrar_asistencia?id={id_clase}"
 
         qr_img = qrcode.make(url_qr)
         buffer = io.BytesIO()
@@ -290,20 +290,21 @@ def generar_qr():
         return jsonify({"error": "Error interno"}), 500
 
 @app.route("/registrar_asistencia", methods=["POST"])
-def registrar_asistencia():
-    # Obtener el id_clase desde el query string
-    id_clase = request.args.get('id')  # id_clase viene desde la URL, por ejemplo, ?id=ID_CLASE
-    
-    data = request.get_json()
-    id_usuario = data.get("id_usuario")
-    fecha = datetime.now().date()
-    hora = datetime.now().strftime("%H:%M:%S")
-
+@token_requerido
+def registrar_asistencia(usuario_id):
     try:
+        # 🔹 1. id_clase viene SOLO del QR
+        id_clase = request.args.get("id")
+        if not id_clase:
+            return jsonify({"error": "QR inválido"}), 400
+
+        fecha = datetime.now().date()
+        hora = datetime.now().strftime("%H:%M:%S")
+
         db = get_connection()
         cursor = db.cursor()
 
-        # Buscar la materia asociada a ese id_clase (asumimos que id_clase corresponde a una materia)
+        # 🔹 2. Buscar la materia asociada a la clase (QR)
         cursor.execute("""
             SELECT id_materia FROM clases WHERE id = %s
         """, (id_clase,))
@@ -312,28 +313,29 @@ def registrar_asistencia():
         if not clase:
             return jsonify({"error": "Clase no encontrada"}), 404
 
-        id_materia = clase[0]  # Tomamos el id_materia asociado al id_clase
+        id_materia = clase[0]
 
-        # Verificamos si ya existe asistencia registrada para ese usuario/materia/fecha
+        # 🔹 3. Verificar si ya existe asistencia
         cursor.execute("""
             SELECT id_asistencia_materia FROM asistencia_materia
             WHERE id_usuario = %s AND id_materia = %s AND fecha = %s
-        """, (id_usuario, id_materia, fecha))
+        """, (usuario_id, id_materia, fecha))
         existente = cursor.fetchone()
 
         if existente:
-            # Ya existe → solo actualizamos el estado
             cursor.execute("""
                 UPDATE asistencia_materia
-                SET qr_validado = 1, hora_registro = %s, dispositivo = %s
+                SET qr_validado = 1,
+                    hora_registro = %s,
+                    dispositivo = %s
                 WHERE id_usuario = %s AND id_materia = %s AND fecha = %s
-            """, (hora, "Navegador Web", id_usuario, id_materia, fecha))
+            """, (hora, "Navegador Web", usuario_id, id_materia, fecha))
         else:
-            # No existe → insertamos nuevo registro
             cursor.execute("""
-                INSERT INTO asistencia_materia (id_usuario, id_materia, fecha, hora_registro, qr_validado, dispositivo)
+                INSERT INTO asistencia_materia
+                (id_usuario, id_materia, fecha, hora_registro, qr_validado, dispositivo)
                 VALUES (%s, %s, %s, %s, %s, %s)
-            """, (id_usuario, id_materia, fecha, hora, 1, "Navegador Web"))
+            """, (usuario_id, id_materia, fecha, hora, 1, "Navegador Web"))
 
         db.commit()
         cursor.close()
@@ -342,9 +344,8 @@ def registrar_asistencia():
         return jsonify({"message": "Asistencia registrada correctamente"}), 200
 
     except Exception as e:
-        db.rollback()
         print("Error al registrar asistencia:", e)
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Error interno"}), 500
 
 
 

@@ -1,57 +1,91 @@
 import React, { useEffect, useRef, useState } from "react";
 import QrScanner from "qr-scanner";
 
-function EscanearQR({ usuario }) {
+function EscanearQR() {
   const videoRef = useRef(null);
+  const scannerRef = useRef(null);
   const [resultado, setResultado] = useState("");
-  const [scanner, setScanner] = useState(null);
+  const [mensaje, setMensaje] = useState("");
 
   useEffect(() => {
-    if (videoRef.current) {
-      const qrScanner = new QrScanner(
-        videoRef.current,
-        (result) => {
-          setResultado(result.data);
-          qrScanner.stop();
-          registrarAsistencia(result.data);
-        },
-        { highlightScanRegion: true }
-      );
-      qrScanner.start();
-      setScanner(qrScanner);
-    }
+    if (!videoRef.current) return;
+
+    const qrScanner = new QrScanner(
+      videoRef.current,
+      async (result) => {
+        const qrUrl = result.data; // 👉 URL completa del QR
+        setResultado(qrUrl);
+        qrScanner.stop();
+
+        await registrarAsistencia(qrUrl);
+      },
+      { highlightScanRegion: true }
+    );
+
+    qrScanner.start();
+    scannerRef.current = qrScanner;
 
     return () => {
-      if (scanner) scanner.stop();
+      qrScanner.stop();
     };
   }, []);
 
-  const registrarAsistencia = async (qrData) => {
+  const registrarAsistencia = async (qrUrl) => {
     try {
-      const response = await fetch("http://10.56.2.58:5000/registrar_asistencia", {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setMensaje("No estás autenticado");
+        return;
+      }
+
+      const response = await fetch(qrUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id_usuario: usuario.id_usuario,
-          qr_data: qrData,
-        }),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
       });
 
       const data = await response.json();
-      alert(data.message || "Asistencia registrada correctamente");
+
+      if (!response.ok) {
+        setMensaje(data.error || "Error al registrar asistencia");
+        return;
+      }
+
+      setMensaje(data.message || "Asistencia registrada correctamente");
     } catch (error) {
       console.error("Error al registrar asistencia:", error);
+      setMensaje("Error de conexión con el servidor");
     }
   };
 
   return (
     <div style={{ textAlign: "center" }}>
       <h2>Escanear QR</h2>
+
       <video
         ref={videoRef}
-        style={{ width: "100%", maxWidth: "400px", borderRadius: "10px" }}
-      ></video>
-      {resultado && <p>QR Detectado: {resultado}</p>}
+        style={{
+          width: "100%",
+          maxWidth: "400px",
+          borderRadius: "10px",
+          border: "2px solid #ccc"
+        }}
+      />
+
+      {resultado && (
+        <p style={{ marginTop: "10px", fontSize: "12px" }}>
+          QR detectado
+        </p>
+      )}
+
+      {mensaje && (
+        <p style={{ marginTop: "15px", fontWeight: "bold" }}>
+          {mensaje}
+        </p>
+      )}
     </div>
   );
 }
