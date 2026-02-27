@@ -15,10 +15,16 @@ Instalacion de los Paquetes Requeridos
 pip install flask flask-cors mysql-connector-python flask-sqlalchemy flask-jwt-extended pymysql qrcode[pil] bcrypt pyjwt python-dotenv
 ```
 Test
+
 ```
 pip install pytest
 ```
 
+Test con Pytest mock
+
+```
+pip install pytest-mock
+```
 
 
 para correr el backend
