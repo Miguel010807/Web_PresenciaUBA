@@ -8,6 +8,7 @@ import {
 import Login from "./components/Login/Login";
 import DashboardDocente from "./components/Dashboard/DashboardDocente";
 import DashboardEstudiante from "./components/Dashboard/DashboardEstudiante";
+import CambiarNumero from "./components/CambiarNumero";
 
 function App() {
   const [usuario, setUsuario] = useState(

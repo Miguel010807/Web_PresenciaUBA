@@ -9,6 +9,8 @@ import {
 } from "react-icons/fa";
 import "./DashboardEstudiante.css";
 import CambiarContraseña from "../CambiarContraseña";
+import CambiarNumero from "../CambiarNumero";
+
 
 function DashboardEstudiante({ usuario, onLogout }) {
   const [escaneando, setEscaneando] = useState(false);
@@ -27,7 +29,7 @@ function DashboardEstudiante({ usuario, onLogout }) {
               const dataQR = JSON.parse(result.data);
 
               const res = await fetch(
-                "http://10.56.13.32:5000/registrar_asistencia",
+                "http://10.56.13.21:5000/registrar_asistencia",
                 {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
@@ -149,6 +151,7 @@ function DashboardEstudiante({ usuario, onLogout }) {
           <div>
             <h2>⚙️ Configuración</h2>
             <CambiarContraseña usuario={usuario} />
+            <CambiarNumero usuario={usuario} />
           </div>
         )}
       </main>

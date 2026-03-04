@@ -1,34 +1,61 @@
 import pytest
+import jwt
+from datetime import datetime, timedelta
 from unittest.mock import patch, MagicMock
 from app import app
 
 
-@pytest.fixture
+# ----------------------------
+# CONFIGURACIÓN GENERAL TEST
+# ----------------------------
+@pytest.fixture(scope="session")
 def client():
     """
     Cliente de pruebas para Flask.
     """
     app.config["TESTING"] = True
+    app.config["SECRET_KEY"] = "mi_secreto_superseguro"
 
     with app.test_client() as client:
         yield client
 
 
+# ----------------------------
+# TOKEN JWT VÁLIDO
+# ----------------------------
+@pytest.fixture
+def token_valido():
+    """
+    Genera un token JWT válido para pruebas.
+    """
+    payload = {
+        "id_usuario": 5,
+        "rol": "estudiante",
+        "exp": datetime.utcnow() + timedelta(hours=1)
+    }
+
+    token = jwt.encode(
+        payload,
+        app.config["SECRET_KEY"],
+        algorithm="HS256"
+    )
+
+    return token
+
+
+# ----------------------------
+# MOCK BASE DE DATOS GLOBAL
+# ----------------------------
 @pytest.fixture
 def mock_db():
     """
-    Mockea get_connection() y pymysql.connect.
-    Crea una conexión y cursor falsos totalmente funcionales.
+    Mockea completamente la conexión a la base de datos.
+    Evita tocar MySQL real.
     """
-    # Creamos objetos falsos
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
 
-    # El cursor del mock debe devolver el mock_cursor
     mock_conn.cursor.return_value = mock_cursor
 
-    # Para endpoints con get_connection()
     with patch("app.get_connection", return_value=mock_conn):
-        # Para endpoints que usan pymysql.connect directamente
-        with patch("pymysql.connect", return_value=mock_conn):
-            yield mock_conn
+        yield mock_conn

@@ -11,7 +11,7 @@ function CambiarContraseña({ usuario }) {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://10.56.13.32:5000/cambiar_contrasena", {
+      const res = await fetch("http://10.56.13.21:5000/cambiar_contrasena", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,47 +1,69 @@
-import jwt
-from datetime import datetime, timedelta
-from unittest.mock import MagicMock
-
-JWT_SECRET = "mi_secreto_superseguro"
-JWT_ALGORITHM = "HS256"
+import pytest
+from unittest.mock import patch, MagicMock
+from datetime import datetime
 
 
-def generar_token(id_usuario): #<--- genera un token
-    payload = {
-        "id_usuario": id_usuario, #<--- usuario para el token
-        "exp": datetime.utcnow() + timedelta(minutes=10) #<--- el tiempo en el que vence el token
-    }
-    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+@patch("app.get_connection")
+def test_registrar_asistencia_insert(mock_get_connection, client, token_valido):
+    """
+    Caso 1:
+    - La clase existe
+    - No hay asistencia previa
+    - Debe hacer INSERT
+    """
 
-
-def test_registrar_asistencia_ok(client, mocker):
-    token = generar_token(id_usuario=1) #<--- genera un usuario autentico(alumno)
-
-    mock_conn = MagicMock()
+    mock_db = MagicMock()
     mock_cursor = MagicMock()
-    mock_conn.cursor.return_value = mock_cursor
-    # Orden de llamadas fetchone():
-    # 1️⃣ SELECT id_materia FROM clases
-    # 2️⃣ SELECT asistencia existente
+
+    mock_get_connection.return_value = mock_db
+    mock_db.cursor.return_value = mock_cursor
+
+    # 🔹 Primera consulta: SELECT id_materia FROM clases
+    # 🔹 Segunda consulta: SELECT asistencia existente
     mock_cursor.fetchone.side_effect = [
-        (10,),     # id_materia
-        None       # no existe asistencia previa
+        (1,),      # Clase encontrada
+        None       # No existe asistencia previa
     ]
 
-    mocker.patch("app.get_connection", return_value=mock_conn)
-
-    # -------------------------
-    # 3. Request simulada
-    # -------------------------
     response = client.post(
-        "/registrar_asistencia?id=UUID_TEST",
-        headers={
-            "Authorization": f"Bearer {token}"
-        }
+        "/asistencias/clases/1/estudiantes/5",
+        headers={"Authorization": f"Bearer {token_valido}"}
     )
-    assert response.status_code == 200
-    assert response.json["message"] == "Asistencia registrada correctamente"
 
-    # INSERT ejecutado
-    mock_cursor.execute.assert_called()
-    mock_conn.commit.assert_called_once()
+    assert response.status_code == 200
+    assert b"Asistencia registrada correctamente" in response.data
+
+    # Verificar que se hizo INSERT
+    assert mock_cursor.execute.call_count >= 3
+    mock_db.commit.assert_called_once()
+
+
+@patch("app.get_connection")
+def test_registrar_asistencia_update(mock_get_connection, client, token_valido):
+    """
+    Caso 2:
+    - La clase existe
+    - Ya hay asistencia previa
+    - Debe hacer UPDATE
+    """
+
+    mock_db = MagicMock()
+    mock_cursor = MagicMock()
+
+    mock_get_connection.return_value = mock_db
+    mock_db.cursor.return_value = mock_cursor
+
+    # 🔹 Primera consulta: Clase encontrada
+    # 🔹 Segunda consulta: Asistencia existente
+    mock_cursor.fetchone.side_effect = [
+        (1,),     # Clase encontrada
+        (10,)     # Asistencia ya existente
+    ]
+
+    response = client.post(
+        "/asistencias/clases/1/estudiantes/5",
+        headers={"Authorization": f"Bearer {token_valido}"}
+    )
+
+    assert response.status_code == 200
+    mock_db.commit.assert_called_once()

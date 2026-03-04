@@ -11,6 +11,7 @@ import qrcode # Para generar el código QR
 import io # Para manejar datos en memoria (usado en el buffer de la imagen) 
 import base64
 import uuid
+from flask import g
 
 
 # Cargar variables del archivo .env
@@ -131,19 +132,19 @@ def token_requerido(f):
         try:
             data = jwt.decode(
                 token,
-                app.config["SECRET_KEY"],   # Ahora usa la misma clave
+                app.config["SECRET_KEY"],
                 algorithms=[JWT_ALGORITHM]
             )
-            usuario_id = data["id_usuario"]
+
+            g.usuario_id = data["id_usuario"]
 
         except Exception as e:
             print("Error JWT:", e)
             return jsonify({"message": "Token inválido"}), 401
 
-        return f(usuario_id, *args, **kwargs)
+        return f(*args, **kwargs)
 
     return decorador
-
 
 # ------------------ CAMBIAR CONTRASEÑA ------------------
 @app.route("/cambiar_contrasena", methods=["POST"])
@@ -205,32 +206,49 @@ def cambiar_contrasena(usuario_id):
 #     # ... (code to handle the PUT request)
 #     return f"Resource {resource_id} updated successfully."
 
-#Cambiar datos(en este caso, el numero)
-@app.route("/usuarios/<int:id_usuario>", methods=["PUT"]) #hay que probarlo en postman
-def actualizar_usuario(id_usuario):
-    # return f"Resource {id_usuario} updated successfully."
-
-    data = request.json
-    nuevo_numero = data.get("numero")
-
-    if not nuevo_numero:
-        return jsonify({"error": "Falta el número de celular"}), 400
-
+@app.route("/cambiar_numero", methods=["PUT"])
+@token_requerido
+def cambiar_numero(usuario_id):
     try:
-        db=get_connection()
-        cursor = db.cursor
-        # Ver si el usuario existe y qué celular tiene
-        cursor.execute("SELECT numero FROM usuarios WHERE id = %s", (str(id_usuario,)))
-        numero_celular = cursor.fetchone()
-        
-        if not numero_celular:
-            return jsonify({"error": "Usuario no encontrado"}), 404
-        
-        cursor.execute(f"UPDATE usuarios SET numero = {nuevo_numero} WHERE id={id_usuario}")
-        return jsonify({"message":"Cambio exitoso"}), 200
+        data = request.get_json()
+        numero_actual = data.get("numero_actual")
+        numero_nuevo = data.get("numero_nuevo")
+
+        if not numero_actual or not numero_nuevo:
+            return jsonify({"message": "Faltan datos"}), 400
+
+        db = get_connection()
+        cursor = db.cursor()
+
+        # Buscar número actual en base
+        cursor.execute(
+            "SELECT numero FROM usuarios WHERE id_usuario = %s",
+            (usuario_id,)
+        )
+        usuario = cursor.fetchone()
+
+        if not usuario:
+            return jsonify({"message": "Usuario no encontrado"}), 404
+
+        numero_bd = usuario[0]
+
+        if numero_bd != numero_actual:
+            return jsonify({"message": "Número actual incorrecto"}), 400
+
+        # Actualizar número
+        cursor.execute(
+            "UPDATE usuarios SET numero = %s WHERE id_usuario = %s",
+            (numero_nuevo, usuario_id)
+        )
+
+        db.commit()
+        cursor.close()
+        db.close()
+
+        return jsonify({"message": "Número actualizado correctamente"}), 200
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Error interno"}), 500
 
 
 # @app.route("/asistencia", methods=["POST"])
@@ -276,7 +294,7 @@ def generar_qr():
 
         db.commit()
 
-        url_qr = f"http://10.56.2.56:5000/registrar_asistencia?id={id_clase}"
+        url_qr = f"http://10.56.13.21:5000/registrar_asistencia?id={id_clase}"
 
         qr_img = qrcode.make(url_qr)
         buffer = io.BytesIO()
@@ -289,22 +307,16 @@ def generar_qr():
         print("Error interno:", e)
         return jsonify({"error": "Error interno"}), 500
 
-@app.route("/registrar_asistencia", methods=["POST"])
+@app.route("/asistencias/clases/<int:id_clase>/estudiantes/<int:usuario_id>", methods=["POST"])
 @token_requerido
-def registrar_asistencia(usuario_id):
+def registrar_asistencia(id_clase, usuario_id):
     try:
-        # 🔹 1. id_clase viene SOLO del QR
-        id_clase = request.args.get("id")
-        if not id_clase:
-            return jsonify({"error": "QR inválido"}), 400
-
         fecha = datetime.now().date()
         hora = datetime.now().strftime("%H:%M:%S")
 
         db = get_connection()
         cursor = db.cursor()
 
-        # 🔹 2. Buscar la materia asociada a la clase (QR)
         cursor.execute("""
             SELECT id_materia FROM clases WHERE id = %s
         """, (id_clase,))
@@ -315,11 +327,15 @@ def registrar_asistencia(usuario_id):
 
         id_materia = clase[0]
 
-        # 🔹 3. Verificar si ya existe asistencia
+        # Verificar asistencia existente
         cursor.execute("""
-            SELECT id_asistencia_materia FROM asistencia_materia
-            WHERE id_usuario = %s AND id_materia = %s AND fecha = %s
+            SELECT id_asistencia_materia 
+            FROM asistencia_materia
+            WHERE id_usuario = %s 
+            AND id_materia = %s 
+            AND fecha = %s
         """, (usuario_id, id_materia, fecha))
+
         existente = cursor.fetchone()
 
         if existente:
@@ -328,7 +344,9 @@ def registrar_asistencia(usuario_id):
                 SET qr_validado = 1,
                     hora_registro = %s,
                     dispositivo = %s
-                WHERE id_usuario = %s AND id_materia = %s AND fecha = %s
+                WHERE id_usuario = %s 
+                AND id_materia = %s 
+                AND fecha = %s
             """, (hora, "Navegador Web", usuario_id, id_materia, fecha))
         else:
             cursor.execute("""
@@ -344,10 +362,47 @@ def registrar_asistencia(usuario_id):
         return jsonify({"message": "Asistencia registrada correctamente"}), 200
 
     except Exception as e:
-        print("Error al registrar asistencia:", e)
+        print("Error:", e)
         return jsonify({"error": "Error interno"}), 500
 
+@app.route("/mi_asistencia", methods=["GET"])
+@token_requerido
+def mi_asistencia(usuario_id):
+    try:
+        db = get_connection()
+        cursor = db.cursor()
 
+        cursor.execute("""
+            SELECT m.nombre, a.fecha, a.hora_registro, a.qr_validado
+            FROM asistencia_materia a
+            JOIN materias m ON a.id_materia = m.id_materia
+            WHERE a.id_usuario = %s
+            ORDER BY a.fecha DESC
+        """, (usuario_id,))
+
+        resultados = cursor.fetchall()
+
+        asistencias = []
+
+        for fila in resultados:
+            asistencias.append({
+                "materia": fila[0],
+                "fecha": str(fila[1]),
+                "hora": fila[2],
+                "estado": "Presente" if fila[3] == 1 else "Ausente"
+            })
+
+        cursor.close()
+        db.close()
+
+        return jsonify({
+            "total": len(asistencias),
+            "asistencias": asistencias
+        }), 200
+
+    except Exception as e:
+        print("Error en mi_asistencia:", e)
+        return jsonify({"error": "Error interno"}), 500
 
 
 
