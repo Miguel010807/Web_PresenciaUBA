@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function CambiarContraseña({ usuario }) {
+function CambiarContraseña() {
   const [actual, setActual] = useState("");
   const [nueva, setNueva] = useState("");
   const [mensaje, setMensaje] = useState("");
@@ -11,14 +11,14 @@ function CambiarContraseña({ usuario }) {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://10.56.13.21:5000/cambiar_contrasena", {
+      const res = await fetch("http://10.56.13.31:5000/cambiar_contrasena", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // el token que esta aca es como un pasaporte, si no te genera el token no podes pasar al dashboard
+          Authorization: `Bearer ${token}`, // el token que esta aca es como un pasaporte, 
+                                            // si no te genera el token no podes pasar al dashboard
         },
         body: JSON.stringify({
-          id_usuario: usuario.id_usuario ,
           actual: actual,
           nueva: nueva,
         }),

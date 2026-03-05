@@ -17,7 +17,7 @@ function EscanearQR() {
         setResultado(qrUrl);
         qrScanner.stop();
 
-        await registrarAsistencia(qrUrl);
+        await registrar_asistencia(qrUrl);
       },
       { highlightScanRegion: true }
     );
@@ -30,7 +30,7 @@ function EscanearQR() {
     };
   }, []);
 
-  const registrarAsistencia = async (qrUrl) => {
+  const registrar_asistencia = async (qrUrl) => {
     try {
       const token = localStorage.getItem("token");
 

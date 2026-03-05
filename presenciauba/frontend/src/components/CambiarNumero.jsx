@@ -15,7 +15,7 @@ function CambiarNumero() {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await fetch("http://10.56.13.21:5000/cambiar_numero", {
+      const response = await fetch("http://10.56.13.31:5000/cambiar_numero", {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,

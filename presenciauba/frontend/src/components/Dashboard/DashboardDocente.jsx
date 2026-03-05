@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Home, QrCode, Clock, LogOut } from "lucide-react"; // <- librería de íconos
 import "./DashboardDocente.css";
 import CambiarContraseña from "../CambiarContraseña";
+import CambiarNumero from "../CambiarNumero";
 
 function DashboardDocente({ usuario, onLogout }) {
   const [formData, setFormData] = useState({
@@ -28,16 +29,21 @@ function DashboardDocente({ usuario, onLogout }) {
     }
 
     try {
-      const res = await fetch("http://10.56.13.32:5000/generar_qr", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const token = localStorage.getItem("token");
+
+  const res = await fetch("http://10.56.13.31:5000/generar_qr", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`
+  },
+  body: JSON.stringify(formData),
+});
 
       const data = await res.json();
 
       if (res.ok) {
-        setQrImage(`data:image/png;base64,${data.qr_image}`);
+        setQrImage(`data:image/png;base64,${data.qr}`);
         setMensaje("QR generado con éxito.");
       } else {
         setMensaje("Error al generar el QR.");
@@ -169,6 +175,7 @@ function DashboardDocente({ usuario, onLogout }) {
           <div>
             <h2>⚙️ Configuración</h2>
             <CambiarContraseña usuario={usuario} />
+            <CambiarNumero usuario={usuario} />
           </div>
         )}
       </main>

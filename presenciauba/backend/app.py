@@ -149,7 +149,9 @@ def token_requerido(f):
 # ------------------ CAMBIAR CONTRASEÑA ------------------
 @app.route("/cambiar_contrasena", methods=["POST"])
 @token_requerido
-def cambiar_contrasena(usuario_id):
+def cambiar_contrasena():
+    usuario_id = g.usuario_id
+
     db = get_connection()
     data = request.get_json()
     actual = data.get("actual")
@@ -206,9 +208,11 @@ def cambiar_contrasena(usuario_id):
 #     # ... (code to handle the PUT request)
 #     return f"Resource {resource_id} updated successfully."
 
+#--------------------CAMBIAR NUMERO--------------------------
 @app.route("/cambiar_numero", methods=["PUT"])
 @token_requerido
-def cambiar_numero(usuario_id):
+def cambiar_numero():
+    usuario_id = g.usuario_id
     try:
         data = request.get_json()
         numero_actual = data.get("numero_actual")
@@ -272,7 +276,10 @@ def cambiar_numero(usuario_id):
 #     except Exception as e:
 #         return jsonify({"error": str(e)}), 500
 
+
+#--------------------------GENERAR QR------------------------------------
 @app.route("/generar_qr", methods=["POST"])
+@token_requerido
 def generar_qr():
     try:
         data = request.get_json()
@@ -289,12 +296,12 @@ def generar_qr():
 
         cursor.execute("""
             INSERT INTO registro_qr (id, numero_aula, curso, materia, fecha, fecha_creacion)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (id_clase, numero_aula, curso, materia, fecha, datetime.now().strftime("%H:%M:%S")))
+            VALUES ( %s, %s, %s, %s, %s, %s)
+        """, (id_clase, numero_aula, curso, materia, fecha, datetime.now()))
 
         db.commit()
 
-        url_qr = f"http://10.56.13.21:5000/registrar_asistencia?id={id_clase}"
+        url_qr = f"http://10.56.13.31:5000/registrar_asistencia?id={id_clase}"
 
         qr_img = qrcode.make(url_qr)
         buffer = io.BytesIO()
@@ -307,6 +314,7 @@ def generar_qr():
         print("Error interno:", e)
         return jsonify({"error": "Error interno"}), 500
 
+#-------------------REGISTRAR ASISTENCIA(RUTAS PARAMETRIZADAS)------------------------
 @app.route("/asistencias/clases/<int:id_clase>/estudiantes/<int:usuario_id>", methods=["POST"])
 @token_requerido
 def registrar_asistencia(id_clase, usuario_id):
@@ -410,8 +418,3 @@ def mi_asistencia(usuario_id):
 if __name__ == "__main__":
 
     app.run(host="0.0.0.0", port=5000, debug=True)
-
-
-
-
-

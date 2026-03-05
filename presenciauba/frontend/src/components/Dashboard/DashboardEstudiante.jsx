@@ -29,7 +29,7 @@ function DashboardEstudiante({ usuario, onLogout }) {
               const dataQR = JSON.parse(result.data);
 
               const res = await fetch(
-                "http://10.56.13.21:5000/registrar_asistencia",
+                "http://10.56.13.31:5000/registrar_asistencia",
                 {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
